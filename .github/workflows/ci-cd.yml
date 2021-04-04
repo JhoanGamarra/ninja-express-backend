@@ -75,10 +75,10 @@ jobs:
      - name: Deploy
        uses: AEnterprise/rsync-deploy@v1.0
        env:
-         DEPLOY_KEY: ${{ secrets.KEY }}
          ARGS: '-avzh --exclude=".*"'
          SERVER_PORT: ${{ secrets.PORT }}
          FOLDER: "./"
          SERVER_IP: ${{ secrets.HOST }}
          USERNAME: ${{ secrets.USERNAME }}
+         PASSWORD: ${{ secrets.PASS }}
          SERVER_DESTINATION: "/var/www/html"
