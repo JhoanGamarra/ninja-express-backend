@@ -8,7 +8,7 @@
 </p>
 
 
-![](https://github.com/JhoanGamarra/ninja-express-backend/workflows/ci-cd/badge.svg)
+![Badge](https://github.com/JhoanGamarra/ninja-express-backend/workflows/ci-cd/badge.svg)
 
 
 
