@@ -23,21 +23,12 @@ class BusinessController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -49,7 +40,6 @@ class BusinessController extends Controller
     {
         $business = Business::get($business);
         return $business;
-
     }
 
     /**
@@ -70,9 +60,20 @@ class BusinessController extends Controller
      * @param  \App\Models\Business  $business
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Business $business)
+    public function update(Request $request)
     {
-        //
+        
+        $user = auth()->user();
+        $business = Business::where('user_id', '=',  $user->id)->firstOrFail();
+        $business->name = $request->name;
+        $business->phone = $request->phone;
+        $business->description = $request->description;
+        $business->category_id = $request->category_id;
+        $business->photo = $request->photo;
+        $business->save();
+
+        return response()->json($business, 201);
+
     }
 
     /**

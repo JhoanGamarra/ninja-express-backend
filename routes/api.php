@@ -15,31 +15,39 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {//
-    return $request->user();
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+
+], function ($router) {
+    Route::post('/login', 'AuthenticationController@login');
+    Route::post('/register', 'AuthenticationController@register');
+    Route::post('/logout', 'AuthenticationController@logout');
+    Route::post('/refresh', 'AuthenticationController@refresh');
+    Route::get('/user-profile', 'AuthenticationController@userProfile');
+    Route::post('/reset-password', 'AuthenticationController@resetPassword');
 });
 
-//Auth
 
-//Route::post('/login', [AuthenticationController::class, 'login']);
-//Route::post('/login', 'AuthenticationController@login');
 
-Route::get('/test', function (Request $request) {
-    return "test";
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'v1'
+
+], function ($router) {
+    Route::resource('/categories', 'CategoryController');
+    Route::get('/categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
+    Route::put('/businesses', 'BusinessController@update');
+
+
+
+    //Route::resource('/businesses', 'BusinessController');
+    Route::resource('/clients', 'ClientController');
+    Route::resource('/couriers', 'CourierController');
+    Route::resource('/addresses', 'AdressController');
+    Route::resource('/clients', "ClientController");
+    Route::resource('/products', 'ProductController');
+    Route::resource('/orders', 'OrderController');
+    Route::resource('/ratings', 'RatingController');
 });
-
-
-Route::resource('busineses', 'BusinessController');
-Route::middleware('auth:api')->resource('clients', 'ClientController');
-Route::middleware('auth:api')->resource('couriers', 'CourierController');
-Route::middleware('auth:api')->resource('addresses', 'AdressController');
-
-Route::middleware('auth:api')->resource('clients', "ClientController");
-Route::middleware('auth:api')->resource('products', 'ProductController');
-Route::middleware('auth:api')->resource('orders', 'OrderController');
-Route::middleware('auth:api')->resource('ratings', 'RatingController');
-Route::resource('categories', 'CategoryController');
-Route::get('categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
-
-
-
