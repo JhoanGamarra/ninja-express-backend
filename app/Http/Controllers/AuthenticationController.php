@@ -50,7 +50,7 @@ class AuthenticationController extends Controller
         }
 
 
-        return response()->json(["token"  => $token], 201);
+        return response()->json(["token"  => $token], 200);
     }
 
     /**
@@ -61,38 +61,44 @@ class AuthenticationController extends Controller
     public function register(Request $request)
     {
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
-
-        $user = User::create(array_merge(
-            $validator->validated(),
-            ['password' => bcrypt($request->password)],
-        ));
-
         $type = $request->type;
 
-        if ($type == "client") {
+        if ($type == "client" || $type == "business" || $type == "courier") {
 
-            Client::create(['name' => $user->name, 'email' => $user->email, 'user_id'  => $user->id]);
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|between:2,100',
+                'email' => 'required|string|email|max:100|unique:users',
+                'password' => 'required|string|min:6',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors()->toJson(), 400);
+            }
+
+            $user = User::create(array_merge(
+                $validator->validated(),
+                ['password' => bcrypt($request->password)],
+            ));
+
+
+            if ($type == "client") {
+
+                Client::create(['name' => $user->name, 'email' => $user->email, 'user_id'  => $user->id]);
+            }
+
+            if ($type == "business") {
+                Business::create(['user_id'  => $user->id,  'email' => $user->email]);
+            }
+
+            if ($type == "courier") {
+                Courier::create(['name' => $user->name, 'user_id'  => $user->id]);
+            }
+
+            return response()->json($user, 201);
         }
 
-        if ($type == "business") {
-            Business::create(['user_id'  => $user->id,  'email' => $user->email]);
-        }
-
-        if ($type == "courier") {
-            Courier::create(['name' => $user->name, 'user_id'  => $user->id]);
-        }
-
-
-        return response()->json($user, 201);
+        return response()->json("Invalid Type", 508);
     }
 
 
@@ -129,24 +135,20 @@ class AuthenticationController extends Controller
 
         try {
             $user = User::where('email', '=', $request->email)->firstOrFail();
-        $password = $this->randomPassword();
-        $user->password = bcrypt($password);
-        $user->save();
-        $data = array("name" => $user->name, "body" => "Tu nueva contraseña temporal es : ", "password" => $password, "warning" => "Recuerda acualizar tu contraseña una vez inicies sesion.");
-        Mail::send('reset-password', $data, function ($message) use ($user) {
-            $message->to($user->email, $user->name)->subject("Reestablecimiento de contraseña Ninja Express");
-            $message->from("support@domiciliariosninjaexpress.com", "NinjaExpress Support");
-        });
+            $password = $this->randomPassword();
+            $user->password = bcrypt($password);
+            $user->save();
+            $data = array("name" => $user->name, "body" => "Tu nueva contraseña temporal es : ", "password" => $password, "warning" => "Recuerda acualizar tu contraseña una vez inicies sesion.");
+            Mail::send('reset-password', $data, function ($message) use ($user) {
+                $message->to($user->email, $user->name)->subject("Reestablecimiento de contraseña Ninja Express");
+                $message->from("support@domiciliariosninjaexpress.com", "NinjaExpress Support");
+            });
 
-        return response()->json(['message' => 'Password Changed'], 200);
-
+            return response()->json(['message' => 'Password Changed'], 200);
         } catch (Throwable $e) {
             report($e);
             return response()->json(['message' => 'User not found'], 404);
-
         }
-
-        
     }
 
 
@@ -167,9 +169,44 @@ class AuthenticationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function userProfile()
+    public function userProfile(Request $request)
     {
-        return response()->json(auth()->user());
+
+
+        $type = $request->type;
+
+        $user = auth()->user();
+
+        if ($type == "client") {
+
+            try {
+                $client = Client::where('user_id', '=', $user->id)->firstOrFail();
+                return response()->json($client, 200);
+            } catch (\Throwable $th) {
+                return response()->json("This user don't have a client", 502);
+            }
+        }
+
+        if ($type == "business") {
+
+            try {
+                $business = Business::where('user_id', '=', $user->id)->firstOrFail();
+                return response()->json($business, 200);
+            } catch (\Throwable $th) {
+                return response()->json("This user don't have a business", 502);
+            }
+        }
+
+        if ($type == "courier") {
+            try {
+                $courier = Courier::where('user_id', '=', $user->id)->firstOrFail();
+                return response()->json($courier, 200);
+            } catch (\Throwable $th) {
+                return response()->json("This user don't have a courier", 502);
+            }
+        }
+
+        return response()->json("Invalid Type", 508);
     }
 
     /**

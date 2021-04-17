@@ -25,7 +25,6 @@ Route::group([
     Route::post('/register', 'AuthenticationController@register');
     Route::post('/logout', 'AuthenticationController@logout');
     Route::post('/refresh', 'AuthenticationController@refresh');
-    Route::get('/user-profile', 'AuthenticationController@userProfile');
     Route::post('/reset-password', 'AuthenticationController@resetPassword');
 });
 
@@ -36,6 +35,7 @@ Route::group([
     'prefix' => 'v1'
 
 ], function ($router) {
+    Route::get('/profile', 'AuthenticationController@userProfile');
     Route::resource('/categories', 'CategoryController');
     Route::get('/categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
     Route::put('/businesses', 'BusinessController@update');
