@@ -26,6 +26,8 @@ Route::group([
     Route::post('/logout', 'AuthenticationController@logout');
     Route::post('/refresh', 'AuthenticationController@refresh');
     Route::post('/reset-password', 'AuthenticationController@resetPassword');
+    Route::put('/password', 'AuthenticationController@updatePassword');
+
 });
 
 
@@ -39,6 +41,7 @@ Route::group([
     Route::resource('/categories', 'CategoryController');
     Route::get('/categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
     Route::put('/businesses', 'BusinessController@update');
+
 
 
 

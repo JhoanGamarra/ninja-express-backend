@@ -102,6 +102,15 @@ class AuthenticationController extends Controller
     }
 
 
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+        $user->password =  bcrypt($request->password);
+        $user->save();
+        return response()->json(['message' => 'Password Successfully changed'], 201);
+    }
+
+
     /**
      * Log the user out (Invalidate the token).
      *
