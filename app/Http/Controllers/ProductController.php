@@ -7,58 +7,63 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+
+
+
+
+
+    public function getProducts($businessId)
     {
-        //
+
+        $products = Product::where('business_id', '=', $businessId)->firstOrFail();
+        return response()->json($products, 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * Store a newly created resource in storage.
+     * Create the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product)
+    public function createProduct(Request $request)
     {
-        //
+        
+        $product = Product::create(["name" => $request->name , "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id]);
+        $product->photo = $this->uploadPhoto($request, $product);
+        $product->save();
+        return response()->json($product, 201);
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
+
+
+    public function uploadPhoto(Request $request, $product)
     {
-        //
+        $image = $request->file('photo'); //image file from mobile  
+        $firebase_storage_path = "business/products/";
+        $name = "product_" . $product->id;
+        $localfolder = public_path('firebase-temp-uploads') . '/';
+        $extension = $image->getClientOriginalExtension();
+        $file      = $name . '.' . $extension;
+        if ($image->move($localfolder, $file)) {
+            $uploadedfile = fopen($localfolder . $file, 'r');
+            $storage  = app('firebase.storage');
+            $bucket = $storage->getBucket();
+            $object = $bucket->upload($uploadedfile, ['name' => $firebase_storage_path . $file, 'predefinedAcl' => 'publicRead']);
+            $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
+            //will remove from local laravel folder  
+            unlink($localfolder . $file);
+
+            return $publicUrl;
+        } else {
+            echo 'error';
+            return response()->json(["message" => "Error to upload firebase"], 504);
+        }
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -67,18 +72,7 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Product $product)
+    public function updateProduct(Request $request, $productId)
     {
         //
     }

@@ -18,10 +18,11 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->mediumText('description');
             $table->float('price');
+            $table->string('photo')->nullable();
             $table->bigInteger('business_id')->unsigned();  
             $table->foreign('business_id')->references('id')->on('businesses');
-            $table->bigInteger('cateogory_id')->unsigned();  
-            $table->foreign('cateogory_id')->references('id')->on('categories');
+            $table->bigInteger('category_id')->unsigned();  
+            $table->foreign('category_id')->references('id')->on('categories');
             $table->timestamps();
         });
     }

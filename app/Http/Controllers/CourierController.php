@@ -7,59 +7,7 @@ use Illuminate\Http\Request;
 
 class CourierController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Courier $courier)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Courier $courier)
-    {
-        //
-    }
-
+   
     /**
      * Update the specified resource in storage.
      *
@@ -67,19 +15,44 @@ class CourierController extends Controller
      * @param  \App\Models\Courier  $courier
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Courier $courier)
+    public function update(Request $request)
     {
-        //
+
+        $user = auth()->user();
+        $courier = Courier::where('user_id', '=',  $user->id)->firstOrFail();
+        $courier->name = $request->name;
+        $courier->phone = $request->phone;
+        $courier->photo = $this->uploadPhoto($request , $courier);
+        $courier->save();
+
+        return response()->json($courier, 211);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Courier $courier)
+
+    public function uploadPhoto(Request $request, $courier)
     {
-        //
+
+        $image = $request->file('photo'); //image file from mobile  
+        $firebase_storage_path = "courier/";
+        $name = $courier->id;
+        $localfolder = public_path('firebase-temp-uploads') . '/';
+        $extension = $image->getClientOriginalExtension();
+        $file      = "courier_" . $name . '.' . $extension;
+        if ($image->move($localfolder, $file)) {
+            $uploadedfile = fopen($localfolder . $file, 'r');
+            $storage  = app('firebase.storage');
+            $bucket = $storage->getBucket();
+            $object = $bucket->upload($uploadedfile, ['name' => $firebase_storage_path . $file, 'predefinedAcl' => 'publicRead']);
+            $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
+            //will remove from local laravel folder  
+            unlink($localfolder . $file);
+
+            return $publicUrl;
+        } else {
+            echo 'error';
+            return response()->json(["message" => "Error to upload firebase"], 504);
+        }
     }
+
+  
 }

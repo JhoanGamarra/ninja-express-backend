@@ -67,13 +67,12 @@ class AuthenticationController extends Controller
 
 
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|between:2,100',
                 'email' => 'required|string|email|max:100|unique:users',
                 'password' => 'required|string|min:6',
             ]);
 
             if ($validator->fails()) {
-                return response()->json($validator->errors()->toJson(), 400);
+                return response()->json($validator->errors()->toJson(), 432);
             }
 
             $user = User::create(array_merge(
@@ -84,21 +83,21 @@ class AuthenticationController extends Controller
 
             if ($type == "client") {
 
-                Client::create(['name' => $user->name, 'email' => $user->email, 'user_id'  => $user->id]);
+                Client::create(['name' => $request->name, 'email' => $user->email, 'user_id'  => $user->id]);
             }
 
             if ($type == "business") {
-                Business::create(['user_id'  => $user->id,  'email' => $user->email]);
+                Business::create(['name' => $request->name, 'user_id'  => $user->id,  'email' => $user->email]);
             }
 
             if ($type == "courier") {
-                Courier::create(['name' => $user->name, 'user_id'  => $user->id]);
+                Courier::create(['name' => $request->name, 'user_id'  => $user->id]);
             }
 
             return response()->json($user, 201);
         }
 
-        return response()->json("Invalid Type", 508);
+        return response()->json("Invalid Type", 502);
     }
 
 
@@ -107,7 +106,7 @@ class AuthenticationController extends Controller
         $user = auth()->user();
         $user->password =  bcrypt($request->password);
         $user->save();
-        return response()->json(['message' => 'Password Successfully changed'], 201);
+        return response()->json(['message' => 'Password Successfully changed'], 211);
     }
 
 
@@ -192,7 +191,7 @@ class AuthenticationController extends Controller
                 $client = Client::where('user_id', '=', $user->id)->firstOrFail();
                 return response()->json($client, 200);
             } catch (\Throwable $th) {
-                return response()->json("This user don't have a client", 502);
+                return response()->json("This user don't have a client", 436);
             }
         }
 
@@ -202,7 +201,7 @@ class AuthenticationController extends Controller
                 $business = Business::where('user_id', '=', $user->id)->firstOrFail();
                 return response()->json($business, 200);
             } catch (\Throwable $th) {
-                return response()->json("This user don't have a business", 502);
+                return response()->json("This user don't have a business", 436);
             }
         }
 
@@ -211,7 +210,7 @@ class AuthenticationController extends Controller
                 $courier = Courier::where('user_id', '=', $user->id)->firstOrFail();
                 return response()->json($courier, 200);
             } catch (\Throwable $th) {
-                return response()->json("This user don't have a courier", 502);
+                return response()->json("This user don't have a courier", 436);
             }
         }
 
