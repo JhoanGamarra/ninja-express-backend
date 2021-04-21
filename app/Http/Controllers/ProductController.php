@@ -16,7 +16,7 @@ class ProductController extends Controller
     public function getProducts($businessId)
     {
 
-        $products = Product::where('business_id', '=', $businessId)->firstOrFail();
+        $products = Product::where('business_id', '=', $businessId)->get();
         return response()->json($products, 200);
     }
 
@@ -30,7 +30,7 @@ class ProductController extends Controller
      */
     public function createProduct(Request $request)
     {
-        
+
         $product = Product::create(["name" => $request->name , "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id]);
         $product->photo = $this->uploadPhoto($request, $product);
         $product->save();
