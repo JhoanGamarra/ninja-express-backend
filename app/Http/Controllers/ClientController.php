@@ -34,7 +34,6 @@ class ClientController extends Controller
         $photo = $this->uploadPhoto($request, $client);
         $client->photo = $photo;
         $client->save();
-
         return response()->json($client, 211);
     }
 
@@ -42,9 +41,6 @@ class ClientController extends Controller
 
     public function uploadPhoto(Request $request, $client)
     {
-
-
-
 
         $image = $request->file('photo'); //image file from mobile  
         $firebase_storage_path = "client/";

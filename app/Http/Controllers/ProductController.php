@@ -11,6 +11,17 @@ class ProductController extends Controller
 
 
 
+    public function getProductById($productId)
+    {
+
+        try {
+            $product = Product::findOrFail($productId);
+            return response()->json($product, 200);
+        } catch (\Throwable $th) {
+            return response()->json($th);
+        }
+
+    }
 
 
     public function getProducts($businessId)
@@ -31,11 +42,10 @@ class ProductController extends Controller
     public function createProduct(Request $request)
     {
 
-        $product = Product::create(["name" => $request->name , "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id]);
+        $product = Product::create(["name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id]);
         $product->photo = $this->uploadPhoto($request, $product);
         $product->save();
         return response()->json($product, 201);
-
     }
 
 
@@ -74,6 +84,14 @@ class ProductController extends Controller
      */
     public function updateProduct(Request $request, $productId)
     {
-        //
+        $product = Product::findOrFail($productId);
+        $product->name = $request->name;
+        $product->description = $request->description;
+        $product->price = $request->price;
+        $product->category_id = $request->category_id;
+        $product->photo = $this->uploadPhoto($request, $product);
+        $product->save();
+
+        return response()->json($product, 200);
     }
 }

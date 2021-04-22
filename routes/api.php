@@ -51,8 +51,9 @@ Route::group([
 
     //Working
     //Products
-    Route::get('/products/{business_id}' , 'ProductController@getProducts');
-    Route::get('/products{product_id}' , 'ProductController@getProductById');
+    Route::get('/business/{business_id}/products/' , 'ProductController@getProducts');
+    Route::get('/products/{product_id}' , 'ProductController@getProductById');
+    Route::post('/products/{product_id}' , 'ProductController@updateProduct');
     Route::post('/products', 'ProductController@createProduct');
     Route::post('/products/{product_id}' , 'ProductController@updateProduct');
     Route::delete('/products{product_id}' , 'ProductController@createProduct');
