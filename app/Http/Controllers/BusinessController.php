@@ -7,50 +7,15 @@ use Illuminate\Http\Request;
 
 class BusinessController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $business = Business::all();
-        return $business;
-    }
 
     /**
-     * Show the form for creating a new resource.
+     * Create a new AuthController instance.
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    public function create(Request $request)
+    public function __construct()
     {
-
-
-    }
-
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Business  $business
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Business $business)
-    {
-        $business = Business::get($business);
-        return $business;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Business  $business
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Business $business)
-    {
-        //
+        $this->middleware('auth:api');
     }
 
     /**
@@ -62,7 +27,7 @@ class BusinessController extends Controller
      */
     public function update(Request $request)
     {
-        
+
         $user = auth()->user();
         $business = Business::where('user_id', '=',  $user->id)->firstOrFail();
         $business->name = $request->name;
@@ -73,7 +38,6 @@ class BusinessController extends Controller
         $business->save();
 
         return response()->json($business, 211);
-
     }
 
 
@@ -99,17 +63,5 @@ class BusinessController extends Controller
             echo 'error';
             return response()->json(["message" => "Error to upload firebase"], 504);
         }
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Business  $business
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Business $business)
-    {
-        //
     }
 }

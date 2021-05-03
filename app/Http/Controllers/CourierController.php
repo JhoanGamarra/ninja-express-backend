@@ -7,7 +7,18 @@ use Illuminate\Http\Request;
 
 class CourierController extends Controller
 {
-   
+
+
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -22,7 +33,18 @@ class CourierController extends Controller
         $courier = Courier::where('user_id', '=',  $user->id)->firstOrFail();
         $courier->name = $request->name;
         $courier->phone = $request->phone;
-        $courier->photo = $this->uploadPhoto($request , $courier);
+        $courier->photo = $this->uploadPhoto($request, $courier);
+        $courier->save();
+
+        return response()->json($courier, 211);
+    }
+
+    public function updateStatus(Request $request , $courierId)
+    {
+
+        $courier = Courier::findOrFail($courierId);
+        $courier->active = $request->active;
+        $courier->available = $request->available;
         $courier->save();
 
         return response()->json($courier, 211);
@@ -53,6 +75,4 @@ class CourierController extends Controller
             return response()->json(["message" => "Error to upload firebase"], 504);
         }
     }
-
-  
 }

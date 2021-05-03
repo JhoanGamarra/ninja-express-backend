@@ -9,6 +9,15 @@ class ProductController extends Controller
 {
 
 
+        /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
 
 
     public function getProductById($productId)
@@ -41,8 +50,7 @@ class ProductController extends Controller
      */
     public function createProduct(Request $request)
     {
-
-        $product = Product::create(["name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id]);
+        $product = Product::create([ "name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id,  "active" => true ]);
         $product->photo = $this->uploadPhoto($request, $product);
         $product->save();
         return response()->json($product, 201);
@@ -90,6 +98,7 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->category_id = $request->category_id;
         $product->photo = $this->uploadPhoto($request, $product);
+        $product->active = $request->active;
         $product->save();
 
         return response()->json($product, 200);
