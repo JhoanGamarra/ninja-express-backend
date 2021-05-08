@@ -29,7 +29,6 @@ Route::group([
     Route::post('/refresh', 'AuthenticationController@refresh');
     Route::post('/reset-password', 'AuthenticationController@resetPassword');
     Route::put('/password', 'AuthenticationController@updatePassword');
-
 });
 
 
@@ -40,25 +39,45 @@ Route::group([
 
 ], function ($router) {
 
-    //Finished
-    Route::get('/profile', 'AuthenticationController@userProfile');
-    Route::resource('/categories', 'CategoryController');
-    Route::get('/categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
-    Route::post('/businesses', 'BusinessController@update');
-    Route::post('/couriers', 'CourierController@update');
+    //TODO  (Try Catch , Response Codes, Validations , Variables Refactoring, SecurityForEndpoints)
+
+    //Address 
+    Route::post('/addresses', 'AddressController@createAddress');
+    Route::get('/addresses/{address_id}', 'AddressController@getAddressById');
+    Route::put('/addresses/{address_id}', 'AddressController@updateAddress');
+    Route::get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
+    Route::get('/clients/{client_id}/addresses', 'AddressController@getClientAddresses');
+
+    //clients
     Route::post('/clients', 'ClientController@update');
+
+    //Couriers
+    Route::post('/couriers', 'CourierController@update');
+    Route::put('/couriers/{courier_id}', 'CourierController@updateStatus');
+
+
+    //Businesses
+    Route::post('/businesses', 'BusinessController@update');
+    Route::get('/categories/{category_id}/businesses', 'BusinessController@getBusinessesByCategory');
+
+
+    //Categories
+    Route::get('/categories', 'CategoryController@getCategories');
+    Route::get('/categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
+
+    //Profile
+    Route::get('/profile', 'AuthenticationController@userProfile');
     Route::post('/photo', 'ClientController@uploadPhoto');
-    Route::get('/business/{business_id}/products/' , 'ProductController@getProducts');
-    Route::get('/products/{product_id}' , 'ProductController@getProductById');
-    Route::post('/products/{product_id}' , 'ProductController@updateProduct');
+
+    //Products
+    Route::get('/businesses/{business_id}/products/', 'ProductController@getProducts'); //change the route  business to a businesses
+    Route::get('/products/{product_id}', 'ProductController@getProductById');
+    Route::post('/products/{product_id}', 'ProductController@updateProduct');
     Route::post('/products', 'ProductController@createProduct');
 
 
-
-
-    //Working
-    //Products
-    Route::put('/couriers/{courier_id}', 'CourierController@updateStatus');
+    //Orders
+    Route::get('/clients/{client_id}/orders', 'OrderController@getClientOrders');
     Route::post('/orders', 'OrderController@createOrder');
     Route::put('/orders/{order_id}', 'OrderController@updateOrder');
     Route::get('/orders/{order_id}', 'OrderController@getOrderById');
@@ -71,4 +90,8 @@ Route::group([
 
 
 
+    //Working
+
+    Route::post('/distance', 'OrderController@haversineGreatCircleDistance');
+    //TODO calculate delivery cost and validate change address in the order real time
 });

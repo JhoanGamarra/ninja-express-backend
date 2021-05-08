@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
 
 class BusinessController extends Controller
@@ -33,11 +34,18 @@ class BusinessController extends Controller
         $business->name = $request->name;
         $business->phone = $request->phone;
         $business->description = $request->description;
-        $business->category_id = $request->category_id;
+        $business->category_id = (int)$request->category_id;
         $business->photo = $this->uploadPhoto($request, $business);
         $business->save();
 
         return response()->json($business, 211);
+    }
+
+
+    public function getBusinessesByCategory($categoryId)
+    {
+        $businesses = Business::whereCategoryId($categoryId)->get();
+        return Response()->json($businesses);
     }
 
 

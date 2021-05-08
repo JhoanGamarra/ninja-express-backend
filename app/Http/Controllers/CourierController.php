@@ -44,7 +44,6 @@ class CourierController extends Controller
 
         $courier = Courier::findOrFail($courierId);
         $courier->active = $request->active;
-        $courier->available = $request->available;
         $courier->save();
 
         return response()->json($courier, 211);

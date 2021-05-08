@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\Courier;
 use App\Models\Order;
 use App\Models\Product;
@@ -48,29 +49,87 @@ class OrderController extends Controller
         $response['order_id'] = $order->id;
         $response['status'] = $order->status;
 
-
         return response()->json($response, 201);
     }
+
+    public function getClientOrders($clientId)
+    {
+
+        $ordersArray = [];
+        $orders = Order::where('client_id', '=', $clientId)->get();
+        foreach ($orders as $order) {
+            $productsArray = [];
+            foreach ($order["products"] as $product) {
+                $productById = Product::findOrFail($product["product_id"]);
+                $productResponse["product"] = $productById;
+                $quantity = $product["quantity"];
+                $productResponse["quantity"] = $quantity;
+                $productResponse["subtotal"] = ($productById->price * $quantity);
+                array_push($productsArray, $productResponse);
+            }
+            $order["products"] = $productsArray;
+            $order["business"] = Business::findOrfail($order->business_id);
+            array_push($ordersArray, $order);
+        }
+
+        return response()->json($ordersArray, 200);
+    }
+
+    public function getBusinessOrders($businessId)
+    {
+
+        $ordersArray = [];
+        $orders = Order::whereBusinessId($businessId)->get();
+        foreach ($orders as $order) {
+            $productsArray = [];
+            foreach ($order["products"] as $product) {
+                $productById = Product::findOrFail($product["product_id"]);
+                $productResponse["product"] = $productById;
+                $quantity = $product["quantity"];
+                $productResponse["quantity"] = $quantity;
+                $productResponse["subtotal"] = ($productById->price * $quantity);
+                array_push($productsArray, $productResponse);
+            }
+            $order["products"] = $productsArray;
+           // $order["business"] = Business::findOrfail($order->business_id);
+            array_push($ordersArray, $order);
+        }
+
+        return response()->json($ordersArray, 200);
+    }
+
+
+    public function haversineGreatCircleDistance(Request $request)
+    {
+
+
+        $earthRadius = 6371000;
+        // convert from degrees to radians
+        $latFrom = deg2rad((float)$request->latitudeFrom);
+        $lonFrom = deg2rad((float)$request->longitudeFrom);
+        $latTo = deg2rad((float)$request->latitudeTo);
+        $lonTo = deg2rad((float)$request->longitudeTo);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+        return $angle * $earthRadius;
+    }
+
 
 
     public function getOrderById($orderId)
     {
 
-        $order =
-            $orderById = Order::findOrFail($orderId);
-
-
+        $order = $orderById = Order::findOrFail($orderId);
         $productsIds = [];
         foreach ($orderById->products as $product) {
             array_push($productsIds, $product["product_id"]);
         }
-
-
         $products = Product::findOrFail($productsIds);
         $order->products = $products;
-
-
-
         return response()->json($order, 200);
     }
 }

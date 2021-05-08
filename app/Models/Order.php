@@ -20,6 +20,7 @@ class Order extends Model
         'products',
         'address',
         'total',
+        'delivery',
 
 
     ];

@@ -21,6 +21,7 @@ class CreateOrdersTable extends Migration
             $table->string('products')->nullable();
             $table->string('total')->nullable();
             $table->string('address')->nullable();
+            $table->string('delivery')->nullable();
             $table->bigInteger('business_id')->unsigned();
             $table->foreign('business_id')->references('id')->on('businesses');
             $table->bigInteger('client_id')->unsigned();

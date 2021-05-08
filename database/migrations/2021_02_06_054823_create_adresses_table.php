@@ -13,14 +13,14 @@ class CreateAdressesTable extends Migration
      */
     public function up()
     {
-        Schema::create('adresses', function (Blueprint $table) {
+        Schema::create('addresses', function (Blueprint $table) {
             $table->id();
             $table->string('principal');
             $table->string('secundary');
             $table->string('complement');
-            $table->bigInteger('client_id')->unsigned();  
+            $table->bigInteger('client_id')->unsigned()->nullable();  
             $table->foreign('client_id')->references('id')->on('clients');
-            $table->bigInteger('business_id')->unsigned();  
+            $table->bigInteger('business_id')->unsigned()->nullable();  
             $table->foreign('business_id')->references('id')->on('businesses');
             $table->timestamps();
         });
