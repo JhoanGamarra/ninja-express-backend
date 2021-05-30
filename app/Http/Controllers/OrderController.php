@@ -7,6 +7,7 @@ use App\Models\Courier;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Spatie\Geocoder\Geocoder;
 
 class OrderController extends Controller
 {
@@ -91,7 +92,7 @@ class OrderController extends Controller
                 array_push($productsArray, $productResponse);
             }
             $order["products"] = $productsArray;
-           // $order["business"] = Business::findOrfail($order->business_id);
+            // $order["business"] = Business::findOrfail($order->business_id);
             array_push($ordersArray, $order);
         }
 
@@ -116,6 +117,25 @@ class OrderController extends Controller
         $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
             cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
         return $angle * $earthRadius;
+    }
+
+
+    //Pending
+    public function getCordinatesFromAddress()
+    {
+
+        $client = new \GuzzleHttp\Client();
+
+        $geocoder = new Geocoder($client);
+
+        $geocoder->setApiKey(config('geocoder.key'));
+
+        $geocoder->setCountry(config('geocoder.country', 'CO'));
+
+        $address = "transversal 112 #20-53";
+        $addressGecode =  $geocoder->getCoordinatesForAddress($address);
+
+        return response()->json($addressGecode);
     }
 
 

@@ -70,7 +70,7 @@ Route::group([
     Route::post('/photo', 'ClientController@uploadPhoto');
 
     //Products
-    Route::get('/businesses/{business_id}/products/', 'ProductController@getProducts'); //change the route  business to a businesses
+    Route::get('/businesses/{business_id}/products/', 'ProductController@getProducts'); //changed the route  business to a businesses
     Route::get('/products/{product_id}', 'ProductController@getProductById');
     Route::post('/products/{product_id}', 'ProductController@updateProduct');
     Route::post('/products', 'ProductController@createProduct');
@@ -86,12 +86,10 @@ Route::group([
 
 
 
-
-
-
-
     //Working
 
     Route::post('/distance', 'OrderController@haversineGreatCircleDistance');
-    //TODO calculate delivery cost and validate change address in the order real time
+    Route::post('/gecoder', 'OrderController@getCordinatesFromAddress');
+
+    //TODO calculate delivery cost and validate change address in getProducts
 });
