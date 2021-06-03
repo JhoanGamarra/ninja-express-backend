@@ -30,7 +30,6 @@ class OrderController extends Controller
             $order->courier_id = $courier->id;
             $courier->available = false;
             $courier->save();
-            //TODO calculate arrived hour from the estimated delivery time
             $order->estimated_delivery_time = $request->estimated_delivery_time;
             $response['courier'] = $courier;
         }
@@ -117,23 +116,61 @@ class OrderController extends Controller
         $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
             cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
         return $angle * $earthRadius;
+        
     }
 
 
+    function getDrivingDistance($latFrom, $longFrom, $latTo, $longTo)
+    {
+
+
+        //40 peso base  hasta 6km
+
+        //azalia-inem = 507.91 m
+        //from = 7.085341, -73.118234
+        //to = 7.080775, -73.118569
+
+        /* $lat1 = 7.085341;
+        $lat2 =7.080775;
+        $long1 = -73.118234;
+        $long2 = -73.118569;*/
+
+        $url = "https://maps.googleapis.com/maps/api/distancematrix/json??units=imperial&origins=" . $latFrom . "," . $longFrom . "&destinations=" . $latTo . "," . $longTo . "&mode=driving&key=AIzaSyAJc2ZO0suEYFUNwAiB5uvZ0ZuVaE64amk";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_PROXYPORT, 3128);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $response_a = json_decode($response, true);
+        $dist = $response_a['rows'][0]['elements'][0]['distance']['text'];
+        $time = $response_a['rows'][0]['elements'][0]['duration']['text'];
+
+        $response['distance'] = $dist;
+        $response['time'] = $time;
+
+        //array('distance' => $dist, 'time' => $time);
+        return response()->json($response);
+    }
+
+
+
+
     //Pending
-    public function getCordinatesFromAddress()
+    public function getCordinatesFromAddress($address)
     {
 
         $client = new \GuzzleHttp\Client();
-
         $geocoder = new Geocoder($client);
-
         $geocoder->setApiKey(config('geocoder.key'));
-
         $geocoder->setCountry(config('geocoder.country', 'CO'));
-
-        $address = "transversal 112 #20-53";
+        //$address = "transversal 112 #20-53";
         $addressGecode =  $geocoder->getCoordinatesForAddress($address);
+        //$geocoder->getAddressForCoordinates(40.714224, -73.961452);
+        //$geocoder->getAllAddressesForCoordinates(40.714224, -73.961452);
+
 
         return response()->json($addressGecode);
     }

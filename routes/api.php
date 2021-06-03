@@ -44,7 +44,9 @@ Route::group([
     //Address 
     Route::post('/addresses', 'AddressController@createAddress');
     Route::get('/addresses/{address_id}', 'AddressController@getAddressById');
+    //working/in testing
     Route::put('/addresses/{address_id}', 'AddressController@updateAddress');
+    //working/in testing
     Route::get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
     Route::get('/clients/{client_id}/addresses', 'AddressController@getClientAddresses');
 
@@ -59,6 +61,11 @@ Route::group([
     //Businesses
     Route::post('/businesses', 'BusinessController@update');
     Route::get('/categories/{category_id}/businesses', 'BusinessController@getBusinessesByCategory');
+
+    //working/in testing
+    Route::post('/dashboard/businesses', 'BusinessController@getDashboardBusinesses');
+    //working/in testing
+
 
 
     //Categories
@@ -89,7 +96,10 @@ Route::group([
     //Working
 
     Route::post('/distance', 'OrderController@haversineGreatCircleDistance');
-    Route::post('/gecoder', 'OrderController@getCordinatesFromAddress');
+    Route::post('/geocoder', 'OrderController@getCordinatesFromAddress');
+    Route::post('/distancedriving', 'OrderController@GetDrivingDistance');
 
-    //TODO calculate delivery cost and validate change address in getProducts
+
+    //TODO/DONE calculate delivery cost and validate change address in getProducts
+    //TODO Push Notifications
 });
