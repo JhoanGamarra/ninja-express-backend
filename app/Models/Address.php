@@ -13,6 +13,7 @@ class Address extends Model
         'state',
         'address',
         'city',
+        "country",
         'lat',
         'lng',
         'description',

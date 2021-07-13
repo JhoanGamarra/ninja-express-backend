@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
-use Facade\FlareClient\Http\Response;
-use Google\Cloud\Storage\Connection\Rest;
-use Illuminate\Http\Request;
 use Spatie\Geocoder\Geocoder;
+use Illuminate\Http\Request;
+
 
 
 class AddressController extends Controller
@@ -17,16 +16,15 @@ class AddressController extends Controller
     public function createAddress(Request $request)
     {
 
-
         //AV. CHAPULTEPEC 1422,BUENOS AIRES
         $state = $request->state;
         $city = $request->city;
-        $country = "Mexico";
+        $country = $request->country;
         $address = $request->address;
         $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
         $address = Address::create([
             "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
-            "client_id" => $request->client_id, "business_id"  => $request->business_id, "description" => $request->description
+            "client_id" => $request->client_id, "business_id"  => $request->business_id, "description" => $request->description , "country" => $country
         ]);
         $response['address'] = $address;
         $response['lat'] = $latAndLong->original['lat'];

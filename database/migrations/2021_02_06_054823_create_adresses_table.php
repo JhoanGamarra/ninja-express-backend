@@ -18,6 +18,7 @@ class CreateAdressesTable extends Migration
             $table->string('state');
             $table->string('city');
             $table->string('address');
+            $table->string('country')->nullable();
             $table->string('lat');
             $table->string('lng');
             $table->string('description');
