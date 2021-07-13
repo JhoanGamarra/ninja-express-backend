@@ -58,21 +58,24 @@ class ClientController extends Controller
         $firebase_storage_path = "client/";
         $name = $client->id;
         $localfolder = public_path('firebase-temp-uploads') . '/';
-        $extension = $image->getClientOriginalExtension();
-        $file      = "client_" . $name . '.' . $extension;
-        if ($image->move($localfolder, $file)) {
-            $uploadedfile = fopen($localfolder . $file, 'r');
-            $storage  = app('firebase.storage');
-            $bucket = $storage->getBucket();
-            $object = $bucket->upload($uploadedfile, ['name' => $firebase_storage_path . $file, 'predefinedAcl' => 'publicRead']);
-            $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
-            //will remove from local laravel folder  
-            unlink($localfolder . $file);
-
-            return $publicUrl;
-        } else {
-            echo 'error';
-            return response()->json(["message" => "Error to upload firebase"], 504);
+        if ($image) {
+            $extension = $image->getClientOriginalExtension();
+            $file      = "client_" . $name . '.' . $extension;
+            if ($image->move($localfolder, $file)) {
+                $uploadedfile = fopen($localfolder . $file, 'r');
+                $storage  = app('firebase.storage');
+                $bucket = $storage->getBucket();
+                $object = $bucket->upload($uploadedfile, ['name' => $firebase_storage_path . $file, 'predefinedAcl' => 'publicRead']);
+                $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
+                //will remove from local laravel folder  
+                unlink($localfolder . $file);
+                return $publicUrl;
+            } else {
+                echo 'error';
+                return response()->json(["message" => "Error to upload firebase"], 504);
+            }
         }
+
+        return "Image profile Null"
     }
 }
