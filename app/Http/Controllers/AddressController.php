@@ -26,7 +26,7 @@ class AddressController extends Controller
         $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
         $address = Address::create([
             "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
-            "client_id" => $request->client_id, "business_id"  => $request->business_id
+            "client_id" => $request->client_id, "business_id"  => $request->business_id, "description" => $request->description
         ]);
         $response['address'] = $address;
         $response['lat'] = $latAndLong->original['lat'];
@@ -70,6 +70,7 @@ class AddressController extends Controller
         $address->lng = $latAndLong->original['lng'];
         $address->state = $request->state;
         $address->city = $request->city;
+        $address->description = $request->description;
         $address->country = $request->country;
         $address->save();
         return Response()->json($address, 200);

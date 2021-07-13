@@ -20,6 +20,7 @@ class CreateAdressesTable extends Migration
             $table->string('address');
             $table->string('lat');
             $table->string('lng');
+            $table->string('description');
             $table->bigInteger('client_id')->unsigned()->nullable();  
             $table->foreign('client_id')->references('id')->on('clients');
             $table->bigInteger('business_id')->unsigned()->nullable();  

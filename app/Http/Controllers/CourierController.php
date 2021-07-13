@@ -30,6 +30,8 @@ class CourierController extends Controller
     {
 
         $user = auth()->user();
+        $user->device_token = $request->device_token;
+        $user->save();
         $courier = Courier::where('user_id', '=',  $user->id)->firstOrFail();
         $courier->name = $request->name;
         $courier->phone = $request->phone;
@@ -44,6 +46,7 @@ class CourierController extends Controller
 
         $courier = Courier::findOrFail($courierId);
         $courier->active = $request->active;
+        $courier->available = $request->available;
         $courier->save();
 
         return response()->json($courier, 211);

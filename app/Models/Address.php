@@ -15,6 +15,7 @@ class Address extends Model
         'city',
         'lat',
         'lng',
+        'description',
         'client_id',
         'business_id',
 

@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\Courier;
 use App\Models\Order;
+use App\Models\User;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Spatie\Geocoder\Geocoder;
+use LaravelFCM\Message\Topics;
+use LaravelFCM\Message\OptionsBuilder;
+use LaravelFCM\Message\PayloadDataBuilder;
+use LaravelFCM\Message\PayloadNotificationBuilder;
+use FCM;
+
 
 class OrderController extends Controller
 {
@@ -26,12 +33,35 @@ class OrderController extends Controller
         $order = Order::findOrFail($orderId);
         if ($request->status == "accepted") {
             //TODO Courier reassignation logic
-            $courier = Courier::where('available', '=', 1)->firstOrFail();
+            /*$courier = Courier::where('available', '=', 1)->firstOrFail();
             $order->courier_id = $courier->id;
             $courier->available = false;
             $courier->save();
             $order->estimated_delivery_time = $request->estimated_delivery_time;
-            $response['courier'] = $courier;
+            $response['courier'] = $courier;*/
+
+            //First notify the couriers
+
+            $couriers = Courier::where('available', '=', 1)->get();
+
+            foreach ($couriers as $courier) {
+
+                $user = User::findOrFail($courier->user_id);
+                $notification_id = $user->device_token;
+                $title = "Greeting Notification";
+                $message = "Have good day!";
+                $id = $user->id;
+                $type = "basic";
+
+                $res = send_notification_FCM($notification_id, $title, $message, $id, $type);
+
+                if ($res == 1) {
+                    $response['courier_assigned'] = true;
+                } else {
+                    $response['courier_assigned'] = false;
+                    $response['error_fcm'] = true;
+                }
+            }
         }
 
         if ($request->status == "shipped") {
@@ -51,6 +81,72 @@ class OrderController extends Controller
 
         return response()->json($response, 201);
     }
+
+
+
+    public function sendMessageToTopicFCM()
+    {
+
+
+        $notificationBuilder = new PayloadNotificationBuilder('my title');
+        $notificationBuilder->setBody('Hello world')
+            ->setSound('default');
+
+        $notification = $notificationBuilder->build();
+
+        $topic = new Topics();
+        $topic->topic('news');
+
+        $topicResponse = FCM::sendToTopic($topic, null, $notification, null);
+
+        $topicResponse->isSuccess();
+        $topicResponse->shouldRetry();
+        $topicResponse->error();
+    }
+
+    public function sendNotificationToDevice()
+    {
+
+        $optionBuilder = new OptionsBuilder();
+        $optionBuilder->setTimeToLive(60 * 20);
+
+        $notificationBuilder = new PayloadNotificationBuilder('my title');
+        $notificationBuilder->setBody('Hello world')
+            ->setSound('default');
+
+        $dataBuilder = new PayloadDataBuilder();
+        $dataBuilder->addData(['a_data' => 'my_data']);
+
+        $option = $optionBuilder->build();
+        $notification = $notificationBuilder->build();
+        $data = $dataBuilder->build();
+
+        $token = "a_registration_from_your_database";
+
+        $downstreamResponse = FCM::sendTo($token, $option, $notification, $data);
+
+        $downstreamResponse->numberSuccess();
+        $downstreamResponse->numberFailure();
+        $downstreamResponse->numberModification();
+
+        // return Array - you must remove all this tokens in your database
+        $downstreamResponse->tokensToDelete();
+
+        // return Array (key : oldToken, value : new token - you must change the token in your database)
+        $downstreamResponse->tokensToModify();
+
+        // return Array - you should try to resend the message to the tokens in the array
+        $downstreamResponse->tokensToRetry();
+
+        // return Array (key:token, value:error) - in production you should remove from your database the tokens
+        $downstreamResponse->tokensWithError();
+    }
+
+
+
+
+
+
 
     public function getClientOrders($clientId)
     {
@@ -75,6 +171,15 @@ class OrderController extends Controller
         return response()->json($ordersArray, 200);
     }
 
+
+
+
+    public function notifyNewOrderToDeliveryCourier(Request $request)
+    {
+    }
+
+
+
     public function getBusinessOrders($businessId)
     {
 
@@ -98,26 +203,6 @@ class OrderController extends Controller
         return response()->json($ordersArray, 200);
     }
 
-
-    public function haversineGreatCircleDistance(Request $request)
-    {
-
-
-        $earthRadius = 6371000;
-        // convert from degrees to radians
-        $latFrom = deg2rad((float)$request->latitudeFrom);
-        $lonFrom = deg2rad((float)$request->longitudeFrom);
-        $latTo = deg2rad((float)$request->latitudeTo);
-        $lonTo = deg2rad((float)$request->longitudeTo);
-
-        $latDelta = $latTo - $latFrom;
-        $lonDelta = $lonTo - $lonFrom;
-
-        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
-        return $angle * $earthRadius;
-        
-    }
 
 
     function getDrivingDistance($latFrom, $longFrom, $latTo, $longTo)

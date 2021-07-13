@@ -32,6 +32,8 @@ class BusinessController extends Controller
     {
 
         $user = auth()->user();
+        $user->device_token = $request->device_token;
+        $user->save();
         $business = Business::where('user_id', '=',  $user->id)->firstOrFail();
         $business->name = $request->name;
         $business->phone = $request->phone;

@@ -38,6 +38,8 @@ class ClientController extends Controller
     {
 
         $user = auth()->user();
+        $user->device_token = $request->device_token;
+        $user->save();
         $client = Client::where('user_id', '=',  $user->id)->firstOrFail();
         $client->name = $request->name;
         $client->phone = $request->phone;
