@@ -9,7 +9,7 @@ class ProductController extends Controller
 {
 
 
-        /**
+    /**
      * Create a new AuthController instance.
      *
      * @return void
@@ -29,7 +29,6 @@ class ProductController extends Controller
         } catch (\Throwable $th) {
             return response()->json($th);
         }
-
     }
 
 
@@ -50,7 +49,7 @@ class ProductController extends Controller
      */
     public function createProduct(Request $request)
     {
-        $product = Product::create([ "name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id,  "active" => true ]);
+        $product = Product::create(["name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id,  "active" => true]);
         $product->photo = $this->uploadPhoto($request, $product);
         $product->save();
         return response()->json($product, 201);
@@ -64,22 +63,27 @@ class ProductController extends Controller
         $firebase_storage_path = "business/products/";
         $name = "product_" . $product->id;
         $localfolder = public_path('firebase-temp-uploads') . '/';
-        $extension = $image->getClientOriginalExtension();
-        $file      = $name . '.' . $extension;
-        if ($image->move($localfolder, $file)) {
-            $uploadedfile = fopen($localfolder . $file, 'r');
-            $storage  = app('firebase.storage');
-            $bucket = $storage->getBucket();
-            $object = $bucket->upload($uploadedfile, ['name' => $firebase_storage_path . $file, 'predefinedAcl' => 'publicRead']);
-            $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
-            //will remove from local laravel folder  
-            unlink($localfolder . $file);
+        if ($image) {
+            $extension = $image->getClientOriginalExtension();
+            $file      = $name . '.' . $extension;
+            if ($image->move($localfolder, $file)) {
+                $uploadedfile = fopen($localfolder . $file, 'r');
+                $storage  = app('firebase.storage');
+                $bucket = $storage->getBucket();
+                $object = $bucket->upload($uploadedfile, ['name' => $firebase_storage_path . $file, 'predefinedAcl' => 'publicRead']);
+                $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
+                //will remove from local laravel folder  
+                unlink($localfolder . $file);
 
-            return $publicUrl;
-        } else {
-            echo 'error';
-            return response()->json(["message" => "Error to upload firebase"], 504);
+                return $publicUrl;
+            } else {
+                echo 'error';
+                return response()->json(["message" => "Error to upload firebase"], 504);
+            }
         }
+
+        return "Image null";
+
     }
 
 

@@ -11,6 +11,16 @@ use Illuminate\Http\Request;
 class AddressController extends Controller
 {
 
+    /**
+     * Create a new AddressController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
 
 
     public function createAddress(Request $request)
@@ -24,7 +34,7 @@ class AddressController extends Controller
         $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
         $address = Address::create([
             "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
-            "client_id" => $request->client_id, "business_id"  => $request->business_id, "description" => $request->description , "country" => $country
+            "client_id" => $request->client_id, "business_id"  => $request->business_id, "description" => $request->description, "country" => $country
         ]);
         $response['address'] = $address;
         $response['lat'] = $latAndLong->original['lat'];
@@ -60,7 +70,7 @@ class AddressController extends Controller
 
     public function updateAddress(Request $request, $addressId)
     {
-        
+
         $latAndLong = $this->getCordinatesFromAddress($request->address . " " . $request->state . " " . $request->city . " " . $request->country);
         $address = Address::findOrFail($addressId);
         $address->address = $request->address;
@@ -72,7 +82,6 @@ class AddressController extends Controller
         $address->country = $request->country;
         $address->save();
         return Response()->json($address, 200);
-
     }
 
     public function getClientAddresses($clientId)
