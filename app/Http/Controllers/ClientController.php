@@ -76,6 +76,6 @@ class ClientController extends Controller
             }
         }
 
-        return "Image profile Null"
+        return "Image profile Null";
     }
 }
