@@ -42,7 +42,7 @@ class AuthenticationController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-       
+
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -75,8 +75,6 @@ class AuthenticationController extends Controller
         $type = $request->type;
 
         if ($type == "client" || $type == "business" || $type == "courier") {
-
-
 
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email|max:100|unique:users',
@@ -169,7 +167,7 @@ class AuthenticationController extends Controller
             return response()->json(['message' => 'Password Changed'], 200);
         } catch (Throwable $e) {
             report($e);
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'Failed Mail Delivery'], 404);
         }
     }
 

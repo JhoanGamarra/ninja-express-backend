@@ -12,7 +12,7 @@ class BusinessController extends Controller
 {
 
     /**
-     * Create a new AuthController instance.
+     * Create a new BusinessController instance.
      *
      * @return void
      */

@@ -10,7 +10,7 @@ class CategoryController extends Controller
 
 
     /**
-     * Create a new AuthController instance.
+     * Create a new CategoryController instance.
      *
      * @return void
      */
