@@ -34,7 +34,7 @@ class AddressController extends Controller
         $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
         $address = Address::create([
             "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
-            "client_id" => $request->client_id, "business_id"  => $request->business_id, "description" => $request->description, "country" => $country
+            "client_id" => $request->client_id, "description" => $request->description, "country" => $country
         ]);
         $response['address'] = $address;
         $response['lat'] = $latAndLong->original['lat'];

@@ -47,20 +47,26 @@ Route::group([
     //working/in testing
     Route::put('/addresses/{address_id}', 'AddressController@updateAddress');
     //working/in testing
-    Route::get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
+    //Route::get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
     Route::get('/clients/{client_id}/addresses', 'AddressController@getClientAddresses');
 
     //clients
     Route::post('/clients', 'ClientController@update');
+    Route::get('/clients', 'ClientController@getAll');
+
 
     //Couriers
     Route::post('/couriers', 'CourierController@update');
+    Route::get('/couriers', 'CourierController@getAll');
     Route::put('/couriers/{courier_id}', 'CourierController@updateStatus');
 
 
     //Businesses
     Route::post('/businesses', 'BusinessController@update');
+    Route::get('/businesses', 'BusinessController@getAll');
     Route::get('/categories/{category_id}/businesses', 'BusinessController@getBusinessesByCategory');
+    Route::put('/businesses/{business_id}/available', 'BusinessController@changeAvailableStatus');
+
 
     //working/in testing
     Route::post('/dashboard/businesses', 'BusinessController@getDashboardBusinesses');
@@ -86,6 +92,7 @@ Route::group([
     //Orders
     Route::get('/clients/{client_id}/orders', 'OrderController@getClientOrders');
     Route::post('/orders', 'OrderController@createOrder');
+    Route::get('/orders', 'OrderController@getAll');
     Route::put('/orders/{order_id}', 'OrderController@updateOrder');
     Route::get('/orders/{order_id}', 'OrderController@getOrderById');
     Route::get('/businesses/{business_id}/orders', 'OrderController@getBusinessOrders');

@@ -25,6 +25,12 @@ class ClientController extends Controller
         $this->middleware('auth:api');
     }
 
+    public function getAll()
+    {
+
+        $clients = Client::get()->all();
+        return response()->json($clients, 200);
+    }
 
 
     /**

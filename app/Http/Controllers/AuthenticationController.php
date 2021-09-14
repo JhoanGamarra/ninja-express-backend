@@ -74,7 +74,7 @@ class AuthenticationController extends Controller
 
         $type = $request->type;
 
-        if ($type == "client" || $type == "business" || $type == "courier") {
+        if ($type == "client" || $type == "business" || $type == "courier" || $type =="admin") {
 
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email|max:100|unique:users',

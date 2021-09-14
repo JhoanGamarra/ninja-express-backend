@@ -19,6 +19,16 @@ class CourierController extends Controller
         $this->middleware('auth:api');
     }
 
+
+    public function getAll(){
+
+        $couriers = Courier::get()->all();
+
+        return response()->json($couriers);
+
+    }
+
+
     /**
      * Update the specified resource in storage.
      *

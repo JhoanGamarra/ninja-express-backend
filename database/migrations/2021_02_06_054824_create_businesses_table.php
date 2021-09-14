@@ -23,6 +23,8 @@ class CreateBusinessesTable extends Migration
             $table->string('photo')->nullable();
             $table->bigInteger('category_id')->unsigned()->nullable();  
             $table->foreign('category_id')->references('id')->on('categories');
+            $table->bigInteger('address_id')->unsigned()->nullable();  
+            $table->foreign('address_id')->references('id')->on('addresses');
             $table->bigInteger('user_id')->unsigned();  
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

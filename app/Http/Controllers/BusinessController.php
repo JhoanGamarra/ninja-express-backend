@@ -21,6 +21,32 @@ class BusinessController extends Controller
         $this->middleware('auth:api');
     }
 
+    public function getAll(){
+
+        $businessesArray = [];
+        $businesses = Business::get()->all();
+        foreach ($businesses as $business) {
+            $address = Address::findOrFail($business->address_id);
+            $business['address'] = $address;
+            array_push($businessesArray, $business);
+        }
+
+        return response()->json($businesses);
+        
+    }
+
+
+    public function changeAvailableStatus(Request $request , $business_id){
+
+        $business = Business::findOrFail($business_id);
+        $business->available = $request->status;
+        $business->save();
+        $message =  $request->status ? "Business was activated successfully" : "Business was deactivated successfully";
+        return response()->json(["message" => $message]);
+
+    }
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -40,6 +66,7 @@ class BusinessController extends Controller
         $business->description = $request->description;
         $business->category_id = (int)$request->category_id;
         $business->photo = $this->uploadPhoto($request, $business);
+        $business->address_id = $request->address_id;
         $business->save();
 
         return response()->json($business, 211);

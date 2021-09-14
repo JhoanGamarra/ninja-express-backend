@@ -35,7 +35,13 @@ class OrderController extends Controller
     public function updateOrder(Request $request, $orderId)
     {
 
-        $order = Order::findOrFail($orderId);
+
+        $order = Order::find($orderId);
+
+        if(!$order){
+            return response()->json(["message" => "the order doesn't exist "]);
+        }
+
         if ($request->status == "accepted") {
             //TODO Courier reassignation logic
             /*$courier = Courier::where('available', '=', 1)->firstOrFail();
@@ -149,6 +155,28 @@ class OrderController extends Controller
 
 
 
+    public function getAll()
+    {
+
+        $ordersArray = [];
+        $orders = Order::get()->all();
+        foreach ($orders as $order) {
+            $productsArray = [];
+            foreach ($order["products"] as $product) {
+                $productById = Product::findOrFail($product["product_id"]);
+                $productResponse["product"] = $productById;
+                $quantity = $product["quantity"];
+                $productResponse["quantity"] = $quantity;
+                $productResponse["subtotal"] = ($productById->price * $quantity);
+                array_push($productsArray, $productResponse);
+            }
+            $order["products"] = $productsArray;
+            $order["business"] = Business::findOrfail($order->business_id);
+            array_push($ordersArray, $order);
+        }
+
+        return response()->json($ordersArray, 200);
+    }
 
 
 

@@ -23,9 +23,7 @@ class CreateAdressesTable extends Migration
             $table->string('lng');
             $table->string('description');
             $table->bigInteger('client_id')->unsigned()->nullable();  
-            $table->foreign('client_id')->references('id')->on('clients');
-            $table->bigInteger('business_id')->unsigned()->nullable();  
-            $table->foreign('business_id')->references('id')->on('businesses');
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('CASCADE');
             $table->timestamps();
         });
     }
@@ -37,6 +35,6 @@ class CreateAdressesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('adresses');
+        Schema::dropIfExists('addresses');
     }
 }
