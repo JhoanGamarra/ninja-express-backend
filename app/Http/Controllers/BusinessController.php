@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\Business;
+use App\Models\Category;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
@@ -26,8 +27,10 @@ class BusinessController extends Controller
         $businessesArray = [];
         $businesses = Business::get()->all();
         foreach ($businesses as $business) {
-            $address = Address::findOrFail($business->address_id);
-            $business['address'] = $address;
+            $address = Address::find($business->address_id);
+            $category = Category::find($business->category_id);
+            $business['address'] = $address['address'] ."," . $address['state'] ."," . $address['city'] ;
+            $business['category'] = $category['name'];
             array_push($businessesArray, $business);
         }
 
@@ -60,13 +63,13 @@ class BusinessController extends Controller
         $user = auth()->user();
         $user->device_token = $request->device_token;
         $user->save();
-        $business = Business::where('user_id', '=',  $user->id)->firstOrFail();
+        $business = Business::where('user_id', '=',  $user->id)->first();
         $business->name = $request->name;
         $business->phone = $request->phone;
         $business->description = $request->description;
         $business->category_id = (int)$request->category_id;
+        $business->address_id = (int)$request->address_id;
         $business->photo = $this->uploadPhoto($request, $business);
-        $business->address_id = $request->address_id;
         $business->save();
 
         return response()->json($business, 211);

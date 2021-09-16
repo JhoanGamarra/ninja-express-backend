@@ -54,7 +54,7 @@ class CourierController extends Controller
     public function updateStatus(Request $request , $courierId)
     {
 
-        $courier = Courier::findOrFail($courierId);
+        $courier = Courier::find($courierId);
         $courier->active = $request->active;
         $courier->available = $request->available;
         $courier->save();

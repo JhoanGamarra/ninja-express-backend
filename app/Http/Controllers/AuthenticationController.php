@@ -55,13 +55,13 @@ class AuthenticationController extends Controller
 
         $user = auth()->user();
 
-        if ($user->device_token != $request->device_token) {
+        /*if ($user->device_token != $request->device_token) {
             $user->device_token = $request->device_token;
             $user->save();
-        }
+        }*/
 
 
-        return response()->json(["token"  => $token], 200);
+        return response()->json(["id" => $user->id , "token"  => $token], 200);
     }
 
     /**
@@ -78,7 +78,6 @@ class AuthenticationController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email|max:100|unique:users',
-                'device_token' => 'required|unique:users',
                 'password' => 'required|string|min:6',
             ]);
 

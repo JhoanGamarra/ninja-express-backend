@@ -68,12 +68,6 @@ Route::group([
     Route::put('/businesses/{business_id}/available', 'BusinessController@changeAvailableStatus');
 
 
-    //working/in testing
-    Route::post('/dashboard/businesses', 'BusinessController@getDashboardBusinesses');
-    //working/in testing
-
-
-
     //Categories
     Route::get('/categories', 'CategoryController@getCategories');
     Route::get('/categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
@@ -98,6 +92,11 @@ Route::group([
     Route::get('/businesses/{business_id}/orders', 'OrderController@getBusinessOrders');
     Route::get('/clients/{client_id}/orders', 'OrderController@getClientOrders');
 
+
+
+    //PUSH NOTIFICATIONS
+
+    Route::post('/push', 'OrderController@sendPush');
 
 
     //Working
