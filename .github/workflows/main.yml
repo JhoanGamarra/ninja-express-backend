@@ -17,4 +17,4 @@ jobs:
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASS }}
         port: ${{ secrets.PORT }}
-        script: git pull origin master
+        script: whoami
