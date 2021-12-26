@@ -1,4 +1,4 @@
-name: ci/cd workflow
+name: CI/CD Ninja Express App
 
 on:
  workflow_dispatch:
