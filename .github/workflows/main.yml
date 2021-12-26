@@ -17,4 +17,6 @@ jobs:
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASS }}
         port: ${{ secrets.PORT }}
-        script: ls
+        script: |
+         cd ninja-express-backend
+         git pull origin master
