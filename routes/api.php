@@ -149,6 +149,6 @@ Route::group(
     ],
     function ($router) {
         Route::get('/categories', 'CategoryController@getCategories');
-        Route::post('auth//login', 'AuthenticationController@login');
+        Route::post('/auth//login', 'AuthenticationController@login');
     }
 );
