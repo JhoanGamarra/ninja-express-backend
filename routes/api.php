@@ -71,6 +71,7 @@ Route::group([
     //Categories
     Route::get('/categories', 'CategoryController@getCategories');
     Route::get('/categories/{category_id}/subcategories', 'CategoryController@getSubcategoryByCategoryId');
+    Route::post('/categories/{category_id}', 'CategoryController@updateCategory');
 
     //Profile
     Route::get('/profile', 'AuthenticationController@userProfile');
