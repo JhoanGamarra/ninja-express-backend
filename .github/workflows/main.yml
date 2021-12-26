@@ -1,0 +1,20 @@
+name: remote ssh command
+on:
+ workflow_dispatch:
+ push:
+   branches:
+     - master
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ 143.198.141.57 }}
+        username: ${{ jhoan }}
+        password: ${{ Jgamarra1. }}
+        port: ${{ 22 }}
+        script: git pull origin master
