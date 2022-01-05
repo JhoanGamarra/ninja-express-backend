@@ -17,4 +17,4 @@ jobs:
        port: ${{ secrets.PORT }}
        script: |
          cd ninja-express-backend
-         php artisan migrate:fresh --seed
+         docker-compose exec app php artisan migrate:fresh --seed
