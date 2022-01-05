@@ -1,0 +1,20 @@
+name: (Warning) Reset Database
+
+on:
+ workflow_dispatch:
+ 
+jobs:
+ migrations_and_seeds:
+   name: Migrations and seeds
+   runs-on: ubuntu-latest
+   steps:
+   - name: executing remote ssh commands using password
+     uses: appleboy/ssh-action@master
+     with:
+       host: ${{ secrets.HOST }}
+       username: ${{ secrets.USERNAME }}
+       password: ${{ secrets.PASS }}
+       port: ${{ secrets.PORT }}
+       script: |
+         cd ninja-express-backend
+         php artisan migrate:fresh --seed
