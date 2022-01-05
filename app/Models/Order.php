@@ -21,8 +21,6 @@ class Order extends Model
         'address',
         'total',
         'delivery',
-
-
     ];
 
     protected $casts = [

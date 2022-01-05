@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
+use App\Models\Business;
 use Spatie\Geocoder\Geocoder;
 use Illuminate\Http\Request;
 
@@ -23,7 +24,7 @@ class AddressController extends Controller
 
 
 
-    public function createAddress(Request $request)
+    public function createClientAddress($clientId , Request $request)
     {
 
         //AV. CHAPULTEPEC 1422,BUENOS AIRES
@@ -34,8 +35,31 @@ class AddressController extends Controller
         $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
         $address = Address::create([
             "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
-            "client_id" => $request->client_id, "description" => $request->description, "country" => $country
+            "client_id" => $clientId, "description" => $request->description, "country" => $country
         ]);
+        $response['address'] = $address;
+        $response['lat'] = $latAndLong->original['lat'];
+        $response['lng'] = $latAndLong->original['lng'];
+
+        return Response()->json($response, 200);
+    }
+
+    public function createBusinessAddress($businessId , Request $request)
+    {
+
+        //AV. CHAPULTEPEC 1422,BUENOS AIRES
+        $state = $request->state;
+        $city = $request->city;
+        $country = $request->country;
+        $address = $request->address;
+        $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
+        $address = Address::create([
+            "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
+            "client_id" => null, "description" => $request->description, "country" => $country
+        ]);
+        $business = Business::findOrFail($businessId);
+        $business->address_id = $address->id;
+        $business->save();
         $response['address'] = $address;
         $response['lat'] = $latAndLong->original['lat'];
         $response['lng'] = $latAndLong->original['lng'];

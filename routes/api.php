@@ -1,19 +1,6 @@
 <?php
 
-use App\Http\Controllers\AuthenticationController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
 Route::group(
     [
@@ -21,16 +8,15 @@ Route::group(
         'prefix' => 'auth',
     ],
     function ($router) {
-        //Finished
-        Route::post('/login', 'AuthenticationController@login');
-        Route::post('/register', 'AuthenticationController@register');
-        Route::post('/logout', 'AuthenticationController@logout');
-        Route::post('/refresh', 'AuthenticationController@refresh');
-        Route::post(
+        $router->post('/login', 'AuthenticationController@login');
+        $router->post('/register', 'AuthenticationController@register');
+        $router->post('/logout', 'AuthenticationController@logout');
+        $router->post('/refresh', 'AuthenticationController@refresh');
+        $router->post(
             '/reset-password',
             'AuthenticationController@resetPassword'
         );
-        Route::put('/password', 'AuthenticationController@updatePassword');
+        $router->put('/password', 'AuthenticationController@updatePassword');
     }
 );
 
@@ -42,113 +28,111 @@ Route::group(
     function ($router) {
         //TODO  (Try Catch , Response Codes, Validations , Variables Refactoring, SecurityForEndpoints)
 
-        //Address
-        Route::post('/addresses', 'AddressController@createAddress');
-        Route::get(
+        $router->get(
             '/addresses/{address_id}',
             'AddressController@getAddressById'
         );
         //working/in testing
-        Route::put(
+        $router->put(
             '/addresses/{address_id}',
             'AddressController@updateAddress'
         );
         //working/in testing
-        //Route::get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
-        Route::get(
+        // $router->get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
+        $router->get(
             '/clients/{client_id}/addresses',
             'AddressController@getClientAddresses'
         );
 
         //clients
-        Route::post('/clients', 'ClientController@update');
-        Route::get('/clients', 'ClientController@getAll');
+        $router->post('/clients', 'ClientController@update');
+        $router->get('/clients', 'ClientController@getAll');
+        $router->post(
+            '/clients/{client_id}/addresses',
+            'AddressController@createClientAddress'
+        );
 
         //Couriers
-        Route::post('/couriers', 'CourierController@update');
-        Route::get('/couriers', 'CourierController@getAll');
-        Route::put('/couriers/{courier_id}', 'CourierController@updateStatus');
+        $router->post('/couriers', 'CourierController@update');
+        $router->get('/couriers', 'CourierController@getAll');
+        $router->put(
+            '/couriers/{courier_id}',
+            'CourierController@updateStatus'
+        );
 
         //Businesses
-        Route::post('/businesses', 'BusinessController@update');
-        Route::get('/businesses', 'BusinessController@getAll');
-        Route::get(
+        $router->post('/businesses', 'BusinessController@update');
+        $router->get('/businesses', 'BusinessController@getAll');
+        $router->get(
             '/categories/{category_id}/businesses',
             'BusinessController@getBusinessesByCategory'
         );
-        Route::put(
+        $router->put(
             '/businesses/{business_id}/available',
             'BusinessController@changeAvailableStatus'
         );
+        $router->post(
+            'businesses/{business_id}/addresses',
+            'AddressController@createBusinessAddress'
+        );
 
         //Categories
-        Route::get('/categories', 'CategoryController@getCategories');
-        Route::get(
+        $router->get('/categories', 'CategoryController@getCategories');
+        $router->get(
             '/categories/{category_id}/subcategories',
             'CategoryController@getSubcategoryByCategoryId'
         );
-        Route::post(
+        $router->post(
             '/categories/{category_id}',
             'CategoryController@updateCategory'
         );
 
         //Profile
-        Route::get('/profile', 'AuthenticationController@userProfile');
-        Route::post('/photo', 'ClientController@uploadPhoto');
+        $router->get('/profile', 'AuthenticationController@userProfile');
+        $router->post('/photo', 'ClientController@uploadPhoto');
 
         //Products
-        Route::get(
+        $router->get(
             '/businesses/{business_id}/products/',
             'ProductController@getProducts'
         ); //changed the route  business to a businesses
-        Route::get(
+        $router->get(
             '/products/{product_id}',
             'ProductController@getProductById'
         );
-        Route::post(
+        $router->post(
             '/products/{product_id}',
             'ProductController@updateProduct'
         );
-        Route::post('/products', 'ProductController@createProduct');
+        $router->post('/products', 'ProductController@createProduct');
 
         //Orders
-        Route::get(
+        $router->get(
             '/clients/{client_id}/orders',
             'OrderController@getClientOrders'
         );
-        Route::post('/orders', 'OrderController@createOrder');
-        Route::get('/orders', 'OrderController@getAll');
-        Route::put('/orders/{order_id}', 'OrderController@updateOrder');
-        Route::get('/orders/{order_id}', 'OrderController@getOrderById');
-        Route::get(
+        $router->post('/orders', 'OrderController@createOrder');
+        $router->get('/orders', 'OrderController@getAll');
+        $router->put('/orders/{order_id}', 'OrderController@updateOrder');
+        $router->get('/orders/{order_id}', 'OrderController@getOrderById');
+        $router->get(
             '/businesses/{business_id}/orders',
             'OrderController@getBusinessOrders'
         );
-        Route::get(
+        $router->get(
             '/clients/{client_id}/orders',
             'OrderController@getClientOrders'
         );
 
         //PUSH NOTIFICATIONS
-        Route::post('/push', 'OrderController@sendPush');
+        $router->post('/push', 'OrderController@sendPush');
 
         //Working
-        Route::post(
+        $router->post(
             '/distance',
             'OrderController@haversineGreatCircleDistance'
         );
-        Route::post('/geocoder', 'OrderController@getCordinatesFromAddress');
-        Route::post('/distancedriving', 'OrderController@GetDrivingDistance');
-    }
-);
-
-Route::group(
-    [
-        'middleware' => 'api',
-        'prefix' => 'v2',
-    ],
-    function ($router) {
-        Route::get('/categories', 'CategoryController@getCategories');
-        Route::post('/auth/login', 'AuthenticationController@login');
+        $router->post('/geocoder', 'OrderController@getCordinatesFromAddress');
+        $router->post('/distancedriving', 'OrderController@GetDrivingDistance');
     }
 );

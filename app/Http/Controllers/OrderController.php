@@ -100,7 +100,7 @@ class OrderController extends Controller
 
     public function updateOrder(Request $request, $orderId)
     {
-        $order = Order::find($orderId);
+        $order = Order::findOrFail($orderId);
         $clientId = Client::find($order->client_id);
         $topicClient = 'client-' . $clientId->user_id;
 

@@ -3,17 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductSubcategory;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
 
-
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -31,7 +26,6 @@ class ProductController extends Controller
         }
     }
 
-
     public function getProducts($businessId)
     {
 
@@ -39,23 +33,21 @@ class ProductController extends Controller
         return response()->json($products, 200);
     }
 
-
-    /**
-     * Create the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function createProduct(Request $request)
     {
         $product = Product::create(["name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id,  "active" => true]);
         $product->photo = $this->uploadPhoto($request, $product);
+        $subcategories = $request->subcategories;
+        foreach ($subcategories as $subcagory) {
+            ProductSubcategory::create([
+                'product_id' => $product->id,
+                'category_id' => $subcagory,
+            ]);
+        }
         $product->save();
+        $product['subcategories'] = $subcategories;
         return response()->json($product, 201);
     }
-
-
 
     public function uploadPhoto(Request $request, $product)
     {
@@ -86,14 +78,6 @@ class ProductController extends Controller
 
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function updateProduct(Request $request, $productId)
     {
         $product = Product::findOrFail($productId);
@@ -104,7 +88,6 @@ class ProductController extends Controller
         $product->photo = $this->uploadPhoto($request, $product);
         $product->active = $request->active;
         $product->save();
-
         return response()->json($product, 200);
     }
 }

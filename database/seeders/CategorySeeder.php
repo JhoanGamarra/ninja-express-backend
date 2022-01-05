@@ -19,6 +19,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Restaurantes',
                 'description' => 'Categoria de alimentos',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_1.svg'
             ]
         );
 
@@ -26,6 +27,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Mascotas',
                 'description' => 'Categoria de mascotas',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_2.svg'
             ]
         );
 
@@ -33,6 +35,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Tecnologia',
                 'description' => 'Categoria de tecnologia',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_3.svg'
             ]
         );
 
@@ -40,6 +43,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Moda',
                 'description' => 'Categoria de moda',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_4.svg'
             ]
         );
 
@@ -47,6 +51,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Belleza',
                 'description' => 'Categoria de belleza',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_5.svg'
             ]
         );
 
@@ -54,6 +59,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Hogar',
                 'description' => 'Categoria de hogar',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_6.svg'
             ]
         );
 
@@ -61,6 +67,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Otros',
                 'description' => 'Categoria de Otros',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_7.svg'
             ]
         );
 
@@ -68,6 +75,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Mensajeria',
                 'description' => 'Categoria de Mensajeria',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_8.svg'
             ]
         );
 
@@ -75,6 +83,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Floristeria',
                 'description' => 'Categoria de floristeria',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_9.svg'
             ]
         );
 
@@ -82,6 +91,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Sex Shop',
                 'description' => 'Categoria de sex shop',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_9.svg'
             ]
         );
 
@@ -89,6 +99,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Jugueteria',
                 'description' => 'Categoria de jugueteria',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_9.svg'
             ]
         );
 
@@ -96,6 +107,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Deportes',
                 'description' => 'Categoria de deportes',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_9.svg'
             ]
         );
 
@@ -103,6 +115,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Bebes & Niños',
                 'description' => 'Categoria de alimentos',
+                'icon' => 'https://ninjaexpressclient.appspot.com.storage.googleapis.com/categories/icons/category_9.svg'
             ]
         );
 

@@ -15,10 +15,9 @@ class CreateBusinessesTable extends Migration
     {
         Schema::create('businesses', function (Blueprint $table) {
             $table->id();
-            $table->boolean('available')->default(0);
+            $table->boolean('available')->default(1);
             $table->string('name')->unique()->nullable();
             $table->string('email')->unique();
-            $table->mediumText('description')->nullable();
             $table->string('phone')->nullable();
             $table->string('photo')->nullable();
             $table->bigInteger('category_id')->unsigned()->nullable();  

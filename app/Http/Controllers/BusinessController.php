@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\Business;
+use App\Models\BusinessSubcategory;
 use App\Models\Category;
-use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Bus;
 
 class BusinessController extends Controller
 {
-
     /**
      * Create a new BusinessController instance.
      *
@@ -22,77 +20,69 @@ class BusinessController extends Controller
         $this->middleware('auth:api');
     }
 
-    public function getAll(){
-
+    public function getAll()
+    {
         $businessesArray = [];
         $businesses = Business::get()->all();
         foreach ($businesses as $business) {
             $address = Address::find($business->address_id);
             $category = Category::find($business->category_id);
-            $business['address'] = $address['address'] ."," . $address['state'] ."," . $address['city'] ;
+            $business['address'] =
+                $address['address'] .
+                ',' .
+                $address['state'] .
+                ',' .
+                $address['city'];
             $business['category'] = $category['name'];
             array_push($businessesArray, $business);
         }
 
         return response()->json($businesses);
-        
     }
 
-
-    public function changeAvailableStatus(Request $request , $business_id){
-
+    public function changeAvailableStatus(Request $request, $business_id)
+    {
         $business = Business::findOrFail($business_id);
         $business->available = $request->status;
         $business->save();
-        $message =  $request->status ? "Business was activated successfully" : "Business was deactivated successfully";
-        return response()->json(["message" => $message]);
-
+        $message = $request->status
+            ? 'Business was activated successfully'
+            : 'Business was deactivated successfully';
+        return response()->json(['message' => $message]);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Business  $business
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request)
     {
-
         $user = auth()->user();
-        $user->device_token = $request->device_token;
-        $user->save();
-        $business = Business::where('user_id', '=',  $user->id)->first();
+        //$user->device_token = $request->device_token;
+        //$user->save();
+        $business = Business::where('user_id', '=', $user->id)->first();
         $business->name = $request->name;
         $business->phone = $request->phone;
-        $business->description = $request->description;
-        $business->category_id = (int)$request->category_id;
-        $business->address_id = (int)$request->address_id;
+        $business->category_id = (int) $request->category_id;
+        $subcategories = (array)$request->subcategories;
+        foreach ($subcategories as $subcagoryId) {
+            BusinessSubcategory::create([
+                'business_id' => $business->id,
+                'category_id' => $subcagoryId
+            ]);
+        }
+        $business->address_id = (int) $request->address_id;
         $business->photo = $this->uploadPhoto($request, $business);
         $business->save();
-
+        $business['subcategories'] = $subcategories;
         return response()->json($business, 211);
     }
 
-
-    //this method get the businesses by category
     public function getBusinessesByCategory($categoryId)
     {
         $businesses = Business::whereCategoryId($categoryId)->get();
-
-        foreach ($businesses as $business) {
-        }
-
         return response()->json($businesses);
     }
 
-
     public function getDashboardBusinesses(Request $request)
     {
-
         //Get businesses by closer location and better rating  || Sorting || Ads
-
 
         $latClient = $request->latClient;
         $lngClient = $request->lngClient;
@@ -101,9 +91,13 @@ class BusinessController extends Controller
         $businessesArrayResponse = [];
 
         foreach ($businesses as $business) {
-
             $businessAddress = Address::whereBusinessId($business->id)->first();
-            $distance = $this->calculateDistance($businessAddress->lat, $businessAddress->lng, $latClient, $lngClient);
+            $distance = $this->calculateDistance(
+                $businessAddress->lat,
+                $businessAddress->lng,
+                $latClient,
+                $lngClient
+            );
             switch ($distance) {
                 case $distance <= 3:
                     $business['deliveryCost'] = 25;
@@ -117,7 +111,7 @@ class BusinessController extends Controller
                 case $distance <= 15:
                     $business['deliveryCost'] = 50;
                     break;
-                default;
+                default:
                     $business['deliveryCost'] = 50;
                     break;
             }
@@ -125,33 +119,36 @@ class BusinessController extends Controller
             $businessesArrayResponse[] = $business;
         }
         //sort businesses by distance
-        usort($businessesArrayResponse, array($this, 'sort_businesses_by_distance'));
+        usort($businessesArrayResponse, [$this, 'sort_businesses_by_distance']);
         return response()->json($businessesArrayResponse);
     }
-
 
     private static function sort_businesses_by_distance($a, $b)
     {
         if ($a->distance == $b->distance) {
             return 0;
         }
-        return ($a->distance < $b->distance) ? -1 : 1;
+        return $a->distance < $b->distance ? -1 : 1;
     }
-
 
     public function calculateDistance($latFrom, $lngFrom, $latTo, $lngTo)
     {
-
         $earthRadius = 6371000;
         // convert from degrees to radians
-        $latFromConverted = deg2rad((float)$latFrom);
-        $lonFromConverted = deg2rad((float)$lngFrom);
-        $latToConverted = deg2rad((float)$latTo);
-        $lonToConverted = deg2rad((float)$lngTo);
+        $latFromConverted = deg2rad((float) $latFrom);
+        $lonFromConverted = deg2rad((float) $lngFrom);
+        $latToConverted = deg2rad((float) $latTo);
+        $lonToConverted = deg2rad((float) $lngTo);
         $latDelta = $latToConverted - $latFromConverted;
         $lonDelta = $lonToConverted - $lonFromConverted;
-        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+        $angle =
+            2 *
+            asin(
+                sqrt(
+                    pow(sin($latDelta / 2), 2) +
+                        cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)
+                )
+            );
         //distance in meters
         $distance = ($angle * $earthRadius) / 1000;
 
@@ -160,28 +157,34 @@ class BusinessController extends Controller
 
     public function uploadPhoto(Request $request, $business)
     {
-        $image = $request->file('photo'); //image file from mobile  
-        $firebase_storage_path = "business/images/";
-        $name = "business_" . $business->id;
+        $image = $request->file('photo'); //image file from mobile
+        $firebase_storage_path = 'business/images/';
+        $name = 'business_' . $business->id;
         $localfolder = public_path('firebase-temp-uploads') . '/';
         $extension = $image->getClientOriginalExtension();
-        $file      = $name . '.' . $extension;
+        $file = $name . '.' . $extension;
         if ($image->move($localfolder, $file)) {
             $uploadedfile = fopen($localfolder . $file, 'r');
-            $storage  = app('firebase.storage');
+            $storage = app('firebase.storage');
             $bucket = $storage->getBucket();
-            $object = $bucket->upload($uploadedfile, ['name' => $firebase_storage_path . $file, 'predefinedAcl' => 'publicRead']);
+            $object = $bucket->upload($uploadedfile, [
+                'name' => $firebase_storage_path . $file,
+                'predefinedAcl' => 'publicRead',
+            ]);
             $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
-            //will remove from local laravel folder  
+            //will remove from local laravel folder
             if (file_exists($localfolder . $file)) {
-                   unlink($localfolder . $file);
-                } else {
-                   echo "The file filename does not exist";
-                }
+                unlink($localfolder . $file);
+            } else {
+                echo 'The file filename does not exist';
+            }
             return $publicUrl;
         } else {
             echo 'error';
-            return response()->json(["message" => "Error to upload firebase"], 504);
+            return response()->json(
+                ['message' => 'Error to upload firebase'],
+                504
+            );
         }
     }
 }
