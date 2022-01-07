@@ -7,11 +7,8 @@ use App\Models\Business;
 use Spatie\Geocoder\Geocoder;
 use Illuminate\Http\Request;
 
-
-
 class AddressController extends Controller
 {
-
     /**
      * Create a new AddressController instance.
      *
@@ -22,20 +19,25 @@ class AddressController extends Controller
         $this->middleware('auth:api');
     }
 
-
-
-    public function createClientAddress($clientId , Request $request)
+    public function createClientAddress($clientId, Request $request)
     {
-
         //AV. CHAPULTEPEC 1422,BUENOS AIRES
         $state = $request->state;
         $city = $request->city;
         $country = $request->country;
         $address = $request->address;
-        $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
+        $latAndLong = $this->getCordinatesFromAddress(
+            $address . ' ' . $state . ' ' . $city . ' ' . $country
+        );
         $address = Address::create([
-            "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
-            "client_id" => $clientId, "description" => $request->description, "country" => $country
+            'state' => $state,
+            'city' => $city,
+            'address' => $address,
+            'lat' => $latAndLong->original['lat'],
+            'lng' => $latAndLong->original['lng'],
+            'client_id' => $clientId,
+            'description' => $request->description,
+            'country' => $country,
         ]);
         $response['address'] = $address;
         $response['lat'] = $latAndLong->original['lat'];
@@ -44,18 +46,25 @@ class AddressController extends Controller
         return Response()->json($response, 200);
     }
 
-    public function createBusinessAddress($businessId , Request $request)
+    public function createBusinessAddress($businessId, Request $request)
     {
-
         //AV. CHAPULTEPEC 1422,BUENOS AIRES
         $state = $request->state;
         $city = $request->city;
         $country = $request->country;
         $address = $request->address;
-        $latAndLong = $this->getCordinatesFromAddress($address . " " . $state . " " . $city . " " . $country);
+        $latAndLong = $this->getCordinatesFromAddress(
+            $address . ' ' . $state . ' ' . $city . ' ' . $country
+        );
         $address = Address::create([
-            "state" => $state, "city" => $city, "address" => $address, "lat" => $latAndLong->original['lat'], "lng" => $latAndLong->original['lng'],
-            "client_id" => null, "description" => $request->description, "country" => $country
+            'state' => $state,
+            'city' => $city,
+            'address' => $address,
+            'lat' => $latAndLong->original['lat'],
+            'lng' => $latAndLong->original['lng'],
+            'client_id' => null,
+            'description' => $request->description,
+            'country' => $country,
         ]);
         $business = Business::findOrFail($businessId);
         $business->address_id = $address->id;
@@ -67,35 +76,40 @@ class AddressController extends Controller
         return Response()->json($response, 200);
     }
 
-
     public function getCordinatesFromAddress($address)
     {
-
         $client = new \GuzzleHttp\Client();
         $geocoder = new Geocoder($client);
         $geocoder->setApiKey(config('geocoder.key'));
         $geocoder->setCountry(config('geocoder.country', 'MX'));
         //$address = "transversal 112 #20-53";
-        $addressGecode =  $geocoder->getCoordinatesForAddress($address);
+        $addressGecode = $geocoder->getCoordinatesForAddress($address);
         //$geocoder->getAddressForCoordinates(40.714224, -73.961452);
         //$geocoder->getAllAddressesForCoordinates(40.714224, -73.961452);
-
 
         return response()->json($addressGecode);
     }
 
-
-    public function getAddressById($adsressId)
+    public function getAddressById($addressId)
     {
-        $address = Address::findOrFail($adsressId);
-
+        $address = Address::whereDeletedAndId(false, $addressId)->first();
+        if($address == null){
+            return Response()->json(["message" => "Address was deleted"], 404);
+        }
         return Response()->json($address, 200);
     }
 
     public function updateAddress(Request $request, $addressId)
     {
-
-        $latAndLong = $this->getCordinatesFromAddress($request->address . " " . $request->state . " " . $request->city . " " . $request->country);
+        $latAndLong = $this->getCordinatesFromAddress(
+            $request->address .
+                ' ' .
+                $request->state .
+                ' ' .
+                $request->city .
+                ' ' .
+                $request->country
+        );
         $address = Address::findOrFail($addressId);
         $address->address = $request->address;
         $address->lat = $latAndLong->original['lat'];
@@ -110,19 +124,15 @@ class AddressController extends Controller
 
     public function getClientAddresses($clientId)
     {
-
         $clientAddresses = Address::whereClientId($clientId)->get();
-
         return Response()->json($clientAddresses);
     }
 
     public function deleteAdress($addressId)
     {
-
         $address = Address::findOrFail($addressId);
-
-        $address->delete();
-
-        return Response()->json("eliminado con exito",  200);
+        $address->deleted = true;
+        $address->save();
+        return Response()->json(["message" => "eliminado con exito"], 200);
     }
 }
