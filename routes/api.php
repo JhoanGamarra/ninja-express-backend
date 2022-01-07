@@ -37,12 +37,13 @@ Route::group(
             '/addresses/{address_id}',
             'AddressController@updateAddress'
         );
+        $router->delete(
+            '/addresses/{address_id}',
+            'AddressController@deleteAdress'
+        );
         //working/in testing
         // $router->get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
-        $router->get(
-            '/clients/{client_id}/addresses',
-            'AddressController@getClientAddresses'
-        );
+       
 
         //clients
         $router->post('/clients', 'ClientController@update');
@@ -50,6 +51,10 @@ Route::group(
         $router->post(
             '/clients/{client_id}/addresses',
             'AddressController@createClientAddress'
+        );
+        $router->get(
+            '/clients/{client_id}/addresses',
+            'AddressController@getClientAddresses'
         );
 
         //Couriers

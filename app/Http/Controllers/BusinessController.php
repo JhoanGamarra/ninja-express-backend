@@ -71,12 +71,16 @@ class BusinessController extends Controller
         $business->photo = $this->uploadPhoto($request, $business);
         $business->save();
         $business['subcategories'] = $subcategories;
+        $business['address'] = Address::findOrFail($request->address_id);
         return response()->json($business, 211);
     }
 
     public function getBusinessesByCategory($categoryId)
     {
         $businesses = Business::whereCategoryId($categoryId)->get();
+        foreach($businesses as $business){
+            $business['address'] = Address::findOrFail($business->address_id);
+        }
         return response()->json($businesses);
     }
 

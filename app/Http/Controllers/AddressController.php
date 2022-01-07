@@ -116,16 +116,6 @@ class AddressController extends Controller
         return Response()->json($clientAddresses);
     }
 
-
-    public function getBussinessAddresses($businessId)
-    {
-
-        $businessAddresses = Address::whereBusinessId($businessId)->get();
-
-        return Response()->json($businessAddresses);
-    }
-
-
     public function deleteAdress($addressId)
     {
 
