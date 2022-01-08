@@ -22,8 +22,6 @@ class CreateProductsTable extends Migration
             $table->boolean('active')->default(1);
             $table->bigInteger('business_id')->unsigned();  
             $table->foreign('business_id')->references('id')->on('businesses');
-            $table->bigInteger('category_id')->unsigned();  
-            $table->foreign('category_id')->references('id')->on('categories');
             $table->timestamps();
         });
     }

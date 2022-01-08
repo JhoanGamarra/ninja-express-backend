@@ -35,7 +35,7 @@ class ProductController extends Controller
 
     public function createProduct(Request $request)
     {
-        $product = Product::create(["name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "category_id" => $request->category_id,  "active" => true]);
+        $product = Product::create(["name" => $request->name, "description" => $request->description, "business_id" => $request->business_id, "price" => $request->price, "active" => true]);
         $product->photo = $this->uploadPhoto($request, $product);
         $subcategories = $request->subcategories;
         foreach ($subcategories as $subcagory) {
