@@ -5,13 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Client extends Model
+class Cart extends Model
 {
     use HasFactory;
+    protected $fillable = ['delivery_cost'];
 
-    protected $fillable = [
-        'name',
-        'user_id',
-        'cart_id'
-    ];
 }

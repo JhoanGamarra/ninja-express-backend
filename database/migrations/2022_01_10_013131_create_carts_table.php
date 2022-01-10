@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DeleteCategoryColumnInProductsTable extends Migration
+class CreateCartsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class DeleteCategoryColumnInProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropForeign('products_category_id_foreign');
-            $table->dropColumn('category_id');
+        Schema::create('carts', function (Blueprint $table) {
+            $table->id();
+            $table->string('delivery_cost')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -26,8 +27,9 @@ class DeleteCategoryColumnInProductsTable extends Migration
      */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            //
+        Schema::table('clients', function (Blueprint $table) {
+            $table->dropForeign('clients_cart_id_foreign');
         });
+        Schema::dropIfExists('carts');
     }
 }

@@ -124,11 +124,11 @@ class AddressController extends Controller
 
     public function getClientAddresses($clientId)
     {
-        $clientAddresses = Address::whereClientId($clientId)->get();
+        $clientAddresses = Address::whereClientIdAndDeleted($clientId, false)->get();
         return Response()->json($clientAddresses);
     }
 
-    public function deleteAdress($addressId)
+    public function deleteAddress($addressId)
     {
         $address = Address::findOrFail($addressId);
         $address->deleted = true;

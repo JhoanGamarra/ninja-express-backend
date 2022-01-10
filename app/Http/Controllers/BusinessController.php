@@ -7,6 +7,7 @@ use App\Models\Business;
 use App\Models\BusinessSubcategory;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Symfony\Component\Console\Input\Input;
 
 class BusinessController extends Controller
 {
@@ -54,17 +55,15 @@ class BusinessController extends Controller
     public function update(Request $request)
     {
         $user = auth()->user();
-        //$user->device_token = $request->device_token;
-        //$user->save();
         $business = Business::where('user_id', '=', $user->id)->first();
         $business->name = $request->name;
         $business->phone = $request->phone;
         $business->category_id = (int) $request->category_id;
-        $subcategories = (array)$request->subcategories;
+        $subcategories = (array) $request->subcategories;
         foreach ($subcategories as $subcagoryId) {
             BusinessSubcategory::create([
                 'business_id' => $business->id,
-                'category_id' => $subcagoryId
+                'category_id' => $subcagoryId,
             ]);
         }
         $business->address_id = (int) $request->address_id;
@@ -75,12 +74,41 @@ class BusinessController extends Controller
         return response()->json($business, 211);
     }
 
-    public function getBusinessesByCategory($categoryId)
+    public function getBusinessesByCategory(Request $request, $categoryId)
     {
+        $clientAddress = Address::find($request->query('addressId'));
         $businesses = Business::whereCategoryId($categoryId)->get();
-        foreach($businesses as $business){
-            $business['address'] = Address::findOrFail($business->address_id);
+        foreach ($businesses as $business) {
+            $businessAddress = Address::findOrFail($business->address_id);
+            $distance =(int) $this->calculateDistance(
+                $businessAddress->lat,
+                $businessAddress->lng,
+                $clientAddress->lat,
+                $clientAddress->lng
+            );
+            switch (true) {
+                case $distance <= 3:
+                    $business['deliveryCost'] = 25;
+                    break;
+                case $distance <= 6:
+                    $business['deliveryCost'] = 35;
+                    break;
+                case $distance <= 10:
+                    $business['deliveryCost'] = 45;
+                    break;
+                case $distance <= 15:
+                    $business['deliveryCost'] = 50;
+                    break;
+                default:
+                    $business['deliveryCost'] = 50;
+                    break;
+            }
+            $business['distance'] = $distance;
+            $business['address'] = $businessAddress;
         }
+        //sort businesses by distance
+        $businesessArray[] = $businesses;
+        usort($businesessArray, [$this, 'sort_businesses_by_distance']);
         return response()->json($businesses);
     }
 

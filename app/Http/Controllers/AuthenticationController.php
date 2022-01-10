@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\Cart;
 use App\Models\Client;
 use App\Models\Courier;
 use Illuminate\Http\Request;
@@ -127,9 +128,12 @@ class AuthenticationController extends Controller
                 if ($validator3->fails()) {
                     return response()->json($validator3->errors(), 422);
                 }
+
+                $cart = Cart::create();
                 $client = Client::create([
                     'name' => $request->name,
                     'user_id' => $user->id,
+                    'cart_id' => $cart->id
                 ]);
                 $user['client'] = $client;
             }

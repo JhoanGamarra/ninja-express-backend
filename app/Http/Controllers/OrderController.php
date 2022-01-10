@@ -58,13 +58,21 @@ class OrderController extends Controller
 
     public function createOrder(Request $request)
     {
+        $products = (array)$request->products;
+        $total = 0;
+        foreach ($products as $productItem) {
+            $product = Product::findOrFail($productItem["product_id"]);
+            $subtotal = $productItem["quantity"] * (int)$product->price;
+            $total = $total + $subtotal;
+        }
+
         $order = Order::create([
             'cash' => $request->cash,
             'status' => $request->status,
             'business_id' => $request->business_id,
             'client_id' => $request->client_id,
             'address' => $request->address,
-            'total' => $request->total,
+            'total' => $total,
             'products' => $request->products,
         ]);
 

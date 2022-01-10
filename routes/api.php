@@ -39,11 +39,14 @@ Route::group(
         );
         $router->delete(
             '/addresses/{address_id}',
-            'AddressController@deleteAdress'
+            'AddressController@deleteAddress'
         );
-        //working/in testing
-        // $router->get('/businesses/{business_id}/addresses', 'AddressController@getBussinessAddresses');
        
+        //Cart 
+        $router->get('/clients/{client_id}/carts', 'CartController@getClientCart');
+        $router->post('/carts/{cart_id}/items', 'CartController@addItemToCart');
+        $router->delete('/carts/items/{item_id}', 'CartController@removeItemToCart');
+
 
         //clients
         $router->post('/clients', 'ClientController@update');
