@@ -51,6 +51,8 @@ Route::group(
         //clients
         $router->post('/clients', 'ClientController@update');
         $router->get('/clients', 'ClientController@getAll');
+        $router->get('/clients/{client_id}', 'ClientController@getClientById');
+
         $router->post(
             '/clients/{client_id}/addresses',
             'AddressController@createClientAddress'
