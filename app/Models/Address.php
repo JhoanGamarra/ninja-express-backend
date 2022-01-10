@@ -19,7 +19,7 @@ class Address extends Model
         'description',
         'client_id',
         'business_id',
-
+        'current',
     ];
 
 }

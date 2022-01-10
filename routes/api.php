@@ -55,6 +55,11 @@ Route::group(
             '/clients/{client_id}/addresses',
             'AddressController@createClientAddress'
         );
+        $router->put(
+            '/clients/{client_id}/addresses',
+            'ClientController@changeCurrentClientAddress'
+        );
+        
         $router->get(
             '/clients/{client_id}/addresses',
             'AddressController@getClientAddresses'

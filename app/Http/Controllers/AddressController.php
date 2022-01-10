@@ -37,6 +37,7 @@ class AddressController extends Controller
             'lng' => $latAndLong->original['lng'],
             'client_id' => $clientId,
             'description' => $request->description,
+            'current' => $request->current,
             'country' => $country,
         ]);
         $response['address'] = $address;
