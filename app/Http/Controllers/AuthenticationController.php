@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\BusinessSubcategory;
 use App\Models\Cart;
+use App\Models\Category;
 use App\Models\Client;
 use App\Models\Courier;
 use Illuminate\Http\Request;
@@ -123,7 +125,7 @@ class AuthenticationController extends Controller
             if ($type == 'client') {
                 $validator3 = Validator::make($request->all(), [
                     'name' => 'required|string|unique:clients',
-                    'email' => 'required|string|email'
+                    'email' => 'required|string|email',
                 ]);
                 if ($validator3->fails()) {
                     return response()->json($validator3->errors(), 422);
@@ -133,7 +135,7 @@ class AuthenticationController extends Controller
                 $client = Client::create([
                     'name' => $request->name,
                     'user_id' => $user->id,
-                    'cart_id' => $cart->id
+                    'cart_id' => $cart->id,
                 ]);
                 $user['client'] = $client;
             }
@@ -141,7 +143,7 @@ class AuthenticationController extends Controller
             if ($type == 'business') {
                 $validator2 = Validator::make($request->all(), [
                     'name' => 'required|string|unique:businesses',
-                    'email' => 'required|string|email'
+                    'email' => 'required|string|email',
                 ]);
                 if ($validator2->fails()) {
                     return response()->json($validator2->errors(), 422);
@@ -151,7 +153,7 @@ class AuthenticationController extends Controller
                     'user_id' => $user->id,
                     'email' => $user->email,
                 ]);
-            
+
                 $user['business'] = $business;
             }
 
@@ -274,11 +276,17 @@ class AuthenticationController extends Controller
 
         if ($type == 'business') {
             try {
-                $business = Business::where(
-                    'user_id',
-                    '=',
-                    $user->id
-                )->firstOrFail();
+                $business = Business::whereUserId($user->id)->firstOrFail();
+                $subcategories = BusinessSubcategory::whereBusinessId(
+                    $business->id
+                )->get();
+                foreach ($subcategories as $subcategory) {
+                    $category = Category::find(
+                        $subcategory->category_id
+                    );
+                    $subcategory['subcategory'] = $category;
+                }
+                $business['subcategories']= $subcategories;
                 return response()->json($business, 200);
             } catch (\Throwable $th) {
                 return response()->json("This user don't have a business", 436);

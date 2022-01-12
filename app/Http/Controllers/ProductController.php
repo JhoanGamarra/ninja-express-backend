@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductSubcategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -38,7 +39,9 @@ class ProductController extends Controller
         $products = Product::whereBusinessId($businessId)->get();
 
         foreach ($products as $product) {
-            $subcategories = ProductSubcategory::whereProductId($product->id)->get();
+            $subcategories = ProductSubcategory::whereProductId(
+                $product->id
+            )->get();
             foreach ($subcategories as $subcategory) {
                 $subcategory['subcategory'] = Category::findOrFail(
                     $subcategory->category_id
@@ -76,15 +79,22 @@ class ProductController extends Controller
     {
         $image = $request->file('photo'); //image file from mobile
         $firebase_storage_path = 'business/products/';
-        $name = 'product_' . $product->id;
+        $name = Carbon::now()->timestamp;
         $localfolder = public_path('firebase-temp-uploads') . '/';
         if ($image) {
             $extension = $image->getClientOriginalExtension();
-            $file = $name . '.' . $extension;
+            $file = 'product-' . $name . '.' . $extension;
             if ($image->move($localfolder, $file)) {
                 $uploadedfile = fopen($localfolder . $file, 'r');
                 $storage = app('firebase.storage');
                 $bucket = $storage->getBucket();
+                if($product->photo){
+                    $oldFileName= explode(
+                        '/',
+                        $product->photo
+                    );
+                    $bucket->object($firebase_storage_path . $oldFileName[5])->delete();
+                }
                 $object = $bucket->upload($uploadedfile, [
                     'name' => $firebase_storage_path . $file,
                     'predefinedAcl' => 'publicRead',
@@ -92,7 +102,6 @@ class ProductController extends Controller
                 $publicUrl = "https://{$bucket->name()}.storage.googleapis.com/{$object->name()}";
                 //will remove from local laravel folder
                 unlink($localfolder . $file);
-
                 return $publicUrl;
             } else {
                 echo 'error';
@@ -102,8 +111,7 @@ class ProductController extends Controller
                 );
             }
         }
-
-        return 'Image null';
+        return 'Image profile Null';
     }
 
     public function updateProduct(Request $request, $productId)
@@ -112,10 +120,37 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->price;
-        $product->category_id = $request->category_id;
-        $product->photo = $this->uploadPhoto($request, $product);
+        $image = $request->file('photo');
+        if ($image) {
+            $product->photo = $this->uploadPhoto($request, $product);
+        }
         $product->active = $request->active;
+        $subcategories = $request->subcategories;
+        if ($subcategories) {
+            $oldSubcategories = ProductSubcategory::whereProductId(
+                $product->id
+            )->get();
+            foreach ($oldSubcategories as $productCategoryOld) {
+                $productCategoryOld->delete();
+            }
+            foreach ($subcategories as $subcagory) {
+                ProductSubcategory::create([
+                    'product_id' => $product->id,
+                    'category_id' => $subcagory,
+                ]);
+            }
+            $subcategoriesResponse = ProductSubcategory::whereProductId($product->id)->get();
+            foreach($subcategoriesResponse as $subcategoryResponse){
+                $subcategoryResponse['subcategory'] = Category::find($subcategoryResponse->category_id);
+            }
+        }else{
+            $subcategoriesResponse = ProductSubcategory::whereProductId($product->id)->get();
+            foreach($subcategoriesResponse as $subcategoryResponse){
+                $subcategoryResponse['subcategory'] = Category::find($subcategoryResponse->category_id);
+            }
+        }
         $product->save();
+        $product['subcategories'] = $subcategoriesResponse;
         return response()->json($product, 200);
     }
 }

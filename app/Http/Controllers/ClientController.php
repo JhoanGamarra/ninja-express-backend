@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Address;
 use App\Models\Business;
 use App\Models\Client;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\ServiceAccount;
 use Kreait\Firebase\Storage;
 use Kreait\Laravel\Firebase\Facades\Firebase;
+
+use function PHPUnit\Framework\fileExists;
 
 class ClientController extends Controller
 {
@@ -27,7 +30,7 @@ class ClientController extends Controller
     public function getClientById($clientId)
     {
         $client = Client::findOrFail($clientId);
-        return response($client,200);
+        return response($client, 200);
     }
 
     public function update(Request $request, Client $client)
@@ -40,8 +43,11 @@ class ClientController extends Controller
         $client->phone = $request->phone;
         $address = Address::findOrFail($request->address_id);
         $address->current = true;
-        $photo = $this->uploadPhoto($request, $client);
-        $client->photo = $photo;
+        $image = $request->file('photo'); //image file from mobile
+        if ($image) {
+            $photo = $this->uploadPhoto($request, $client);
+            $client->photo = $photo;
+        }
         $client->save();
         $client['current_address'] = $address;
         return response()->json($client, 211);
@@ -68,15 +74,22 @@ class ClientController extends Controller
     {
         $image = $request->file('photo'); //image file from mobile
         $firebase_storage_path = 'client/';
-        $name = $client->id;
+        $name = Carbon::now()->timestamp;
         $localfolder = public_path('firebase-temp-uploads') . '/';
         if ($image) {
             $extension = $image->getClientOriginalExtension();
-            $file = 'client_' . $name . '.' . $extension;
+            $file = 'client-' . $name . '.' . $extension;
             if ($image->move($localfolder, $file)) {
                 $uploadedfile = fopen($localfolder . $file, 'r');
                 $storage = app('firebase.storage');
                 $bucket = $storage->getBucket();
+                if($client->photo){
+                    $oldFileName= explode(
+                        '/',
+                        $client->photo
+                    );
+                    $bucket->object($firebase_storage_path . $oldFileName[4])->delete();
+                }
                 $object = $bucket->upload($uploadedfile, [
                     'name' => $firebase_storage_path . $file,
                     'predefinedAcl' => 'publicRead',

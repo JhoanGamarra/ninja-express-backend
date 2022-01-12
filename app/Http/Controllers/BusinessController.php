@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Business;
 use App\Models\BusinessSubcategory;
 use App\Models\Category;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\Console\Input\Input;
 
@@ -58,18 +59,38 @@ class BusinessController extends Controller
         $business = Business::where('user_id', '=', $user->id)->first();
         $business->name = $request->name;
         $business->phone = $request->phone;
-        $business->category_id = (int) $request->category_id;
+        if ($request->category_id) {
+            $business->category_id = (int) $request->category_id;
+        }
         $subcategories = (array) $request->subcategories;
-        foreach ($subcategories as $subcagoryId) {
-            BusinessSubcategory::create([
-                'business_id' => $business->id,
-                'category_id' => $subcagoryId,
-            ]);
+        if($subcategories){
+        $oldSubcategories = BusinessSubcategory::whereBusinessId($business->id)->get();
+            foreach($oldSubcategories as $oldSubcategory){
+                $oldSubcategory->delete();
+            }
+            $subcategories = (array) $request->subcategories;
+            foreach ($subcategories as $subcagoryId) {
+                BusinessSubcategory::create([
+                    'business_id' => $business->id,
+                    'category_id' => $subcagoryId,
+                ]);
+            }
+            $subcategoriesResponse = BusinessSubcategory::whereBusinessId($business->id)->get();
+            foreach($subcategoriesResponse as $subcategoryResponse){
+                $subcategoryResponse['subcategory'] = Category::find($subcategoryResponse->category_id);
+            }
+        }else{
+            $subcategoriesResponse = BusinessSubcategory::whereBusinessId($business->id)->get();
+            foreach($subcategoriesResponse as $subcategoryResponse){
+                $subcategoryResponse['subcategory'] = Category::find($subcategoryResponse->category_id);
+            }
         }
         $business->address_id = (int) $request->address_id;
-        $business->photo = $this->uploadPhoto($request, $business);
+        if($request->file('photo')){
+            $business->photo = $this->uploadPhoto($request, $business);
+        }
         $business->save();
-        $business['subcategories'] = $subcategories;
+        $business['subcategories'] = $subcategoriesResponse;
         $business['address'] = Address::findOrFail($request->address_id);
         return response()->json($business, 211);
     }
@@ -80,7 +101,7 @@ class BusinessController extends Controller
         $businesses = Business::whereCategoryId($categoryId)->get();
         foreach ($businesses as $business) {
             $businessAddress = Address::findOrFail($business->address_id);
-            $distance =(int) $this->calculateDistance(
+            $distance = (int) $this->calculateDistance(
                 $businessAddress->lat,
                 $businessAddress->lng,
                 $clientAddress->lat,
@@ -191,14 +212,20 @@ class BusinessController extends Controller
     {
         $image = $request->file('photo'); //image file from mobile
         $firebase_storage_path = 'business/images/';
-        $name = 'business_' . $business->id;
+        $name = Carbon::now()->timestamp;
         $localfolder = public_path('firebase-temp-uploads') . '/';
         $extension = $image->getClientOriginalExtension();
-        $file = $name . '.' . $extension;
+        $file = 'business-' . $name . '.' . $extension;
         if ($image->move($localfolder, $file)) {
             $uploadedfile = fopen($localfolder . $file, 'r');
             $storage = app('firebase.storage');
             $bucket = $storage->getBucket();
+            if ($business->photo) {
+                $oldFileName = explode('/', $business->photo);
+                $bucket
+                    ->object($firebase_storage_path . $oldFileName[5])
+                    ->delete();
+            }
             $object = $bucket->upload($uploadedfile, [
                 'name' => $firebase_storage_path . $file,
                 'predefinedAcl' => 'publicRead',
