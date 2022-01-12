@@ -93,7 +93,9 @@ class BusinessController extends Controller
         }
         $business->save();
         $business['subcategories'] = $subcategoriesResponse;
-        $business['address'] = Address::findOrFail($request->address_id);
+        if($request->address_id){
+            $business['address'] = Address::findOrFail($request->address_id);
+        }
         return response()->json($business, 211);
     }
 
