@@ -85,7 +85,9 @@ class BusinessController extends Controller
                 $subcategoryResponse['subcategory'] = Category::find($subcategoryResponse->category_id);
             }
         }
-        $business->address_id = (int) $request->address_id;
+        if($request->address_id){
+            $business->address_id = (int) $request->address_id;
+        }
         if($request->file('photo')){
             $business->photo = $this->uploadPhoto($request, $business);
         }
