@@ -41,15 +41,14 @@ class ClientController extends Controller
         $client = Client::where('user_id', '=', $user->id)->firstOrFail();
         $client->name = $request->name;
         $client->phone = $request->phone;
-        $address = Address::findOrFail($request->address_id);
-        $address->current = true;
         $image = $request->file('photo'); //image file from mobile
         if ($image) {
             $photo = $this->uploadPhoto($request, $client);
             $client->photo = $photo;
         }
         $client->save();
-        $client['current_address'] = $address;
+        $currentAddress = Address::whereClientIdAndCurrent($client->id, true)->first();
+        $client['current_address'] = $currentAddress;
         return response()->json($client, 211);
     }
 

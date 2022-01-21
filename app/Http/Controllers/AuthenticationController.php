@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Business;
 use App\Models\BusinessSubcategory;
 use App\Models\Cart;
@@ -268,6 +269,10 @@ class AuthenticationController extends Controller
                     '=',
                     $user->id
                 )->firstOrFail();
+                $client['email'] = $user->email;
+                $address = Address::whereClientIdAndCurrent($client->id, true)->first();
+                $client['address_id'] = $address->id;
+                $client['current_address'] = $address;
                 return response()->json($client, 200);
             } catch (\Throwable $th) {
                 return response()->json("This user don't have a client", 436);
@@ -287,6 +292,7 @@ class AuthenticationController extends Controller
                     $subcategory['subcategory'] = $category;
                 }
                 $business['subcategories']= $subcategories;
+                $business['email'] = $user->email;
                 return response()->json($business, 200);
             } catch (\Throwable $th) {
                 return response()->json("This user don't have a business", 436);
@@ -300,6 +306,7 @@ class AuthenticationController extends Controller
                     '=',
                     $user->id
                 )->firstOrFail();
+                $courier['email'] = $user->email;
                 return response()->json($courier, 200);
             } catch (\Throwable $th) {
                 return response()->json("This user don't have a courier", 436);
