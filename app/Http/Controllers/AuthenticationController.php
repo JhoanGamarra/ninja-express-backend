@@ -264,14 +264,14 @@ class AuthenticationController extends Controller
 
         if ($type == 'client') {
             try {
-                $client = Client::where(
-                    'user_id',
-                    '=',
-                    $user->id
-                )->firstOrFail();
+                $client = Client::whereUserId($user->id)->firstOrFail();
                 $client['email'] = $user->email;
                 $address = Address::whereClientIdAndCurrent($client->id, true)->first();
-                $client['address_id'] = $address->id;
+                if($address){
+                    $client['address_id'] = $address->id;
+                }else{
+                    $client['address_id'] = null;
+                }
                 $client['current_address'] = $address;
                 return response()->json($client, 200);
             } catch (\Throwable $th) {
