@@ -29,6 +29,13 @@ class AddressController extends Controller
         $latAndLong = $this->getCordinatesFromAddress(
             $address . ' ' . $state . ' ' . $city . ' ' . $country
         );
+        if($request->current){
+            $clientAddresses = Address::whereClientId($clientId)->get();
+            foreach($clientAddresses as $clientAddress){
+                $clientAddress->current = false;
+                $clientAddress->save();
+            }
+        }
         $address = Address::create([
             'state' => $state,
             'city' => $city,
@@ -43,7 +50,6 @@ class AddressController extends Controller
         $response['address'] = $address;
         $response['lat'] = $latAndLong->original['lat'];
         $response['lng'] = $latAndLong->original['lng'];
-
         return Response()->json($response, 200);
     }
 
