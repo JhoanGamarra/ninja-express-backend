@@ -11,14 +11,15 @@ jobs:
     outputs:
       status: ${{ steps.set_output.outputs.status }}
     steps:
+
       - name: PR title checker
-      - uses: deepakputhraya/action-pr-title@master
+        uses: deepakputhraya/action-pr-title@master
         with:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
           github_token: ${{ secrets.TOKEN }}
 
       - name: PR title checker
-      - uses: deepakputhraya/action-branch-name@master
+        uses: deepakputhraya/action-branch-name@master
         with:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
           ignore: master
