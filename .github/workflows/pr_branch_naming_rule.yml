@@ -1,4 +1,4 @@
-name: PR and branch naming rule
+name: PR and branch naming rule checker
 
 on:
   pull_request:
