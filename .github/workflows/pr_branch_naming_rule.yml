@@ -24,26 +24,34 @@ jobs:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
           ignore: master
 
-      - name: Slack Notification Successful
-        if: ${{ steps.set_output.outputs.status == 'success' }}
-        uses: edge/simple-slack-notify@master
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        with:
-          status: ${{ job.status }}
-          text: 'Successful' 
-          color: 'good'
-          fields: |
-            [{ "title": "Branch and PR title checker", "value": "PR and Branch naming rule checker was succesful", "short": true }]
+  notification:
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+     - naming_rule
+    steps:
+    - uses: actions/checkout@v2
+    - name: Expose git commit data
+      uses: rlespinasse/git-commit-data-action@v1.x
 
-      - name: Slack Notification Failed
-        if: ${{ steps.set_output.outputs.status != 'success' }}
-        uses: edge/simple-slack-notify@master
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        with:
-          status: ${{ steps.set_output.outputs.status }}
-          text: ${{ job.status }}
-          color: 'danger'
-          fields: |
-            [{ "title": "Branch and PR title Failed", "value": "PR and Branch naming rule checker was failed", "short": true }]
+    - name: Slack Notification
+      if: ${{ needs.naming_rule.outputs.status == 'success' }}
+      uses: rtCamp/action-slack-notify@v2.0.2
+      env:
+        SLACK_CHANNEL: android
+        SLACK_COLOR: '#008000'
+        SLACK_MESSAGE: 'Test build created succesfully ${{ github.head_ref }} : ${{ steps.set_output.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
+        SLACK_TITLE: 'PR and Branch naming rule checker'
+        SLACK_USERNAME: bot
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        
+    - name: Slack Notification
+      if: ${{ needs.naming_rule.outputs.status != 'success' }} 
+      uses: rtCamp/action-slack-notify@v2.0.2
+      env:
+        SLACK_CHANNEL: android
+        SLACK_COLOR: '#FF0000'
+        SLACK_MESSAGE: 'Error with PR and branch naming rule ${{ github.head_ref }} : ${{ steps.set_output.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
+        SLACK_TITLE: 'PR and Branch naming rule checker'
+        SLACK_USERNAME: bot
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
