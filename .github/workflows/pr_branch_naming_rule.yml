@@ -12,11 +12,6 @@ jobs:
       status: ${{ steps.set_output.outputs.status }}
     steps:
 
-      - name: set output
-        id: set_output
-        if: ${{ always() }}
-        run: echo ::set-output name=status::${{ job.status }}
-
       - name: Verify PR Title
       - uses: deepakputhraya/action-pr-title@master
         with:
@@ -30,13 +25,12 @@ jobs:
           ignore: master
 
       - name: Slack Notification
-        if: ${{ needs.create_build.outputs.status != 'success' }} 
         uses: edge/simple-slack-notify@master
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         with:
           status: ${{ job.status }}
-          text: ${{ needs.create_build.outputs.status != 'success' }} 
+          text: ${{ steps.set_output.outputs.status }}
           color: 'good'
           success_text: 'Something was wrong, please check the branch or PR name'
           fields: |
