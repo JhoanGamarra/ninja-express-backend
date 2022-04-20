@@ -42,8 +42,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         with:
-          status: ${{ job.status }}
-          text: ${{ steps.set_output.outputs.status }}
+          status: ${{ steps.set_output.outputs.status }}
+          text: ${{ job.status }}
           color: 'danger'
           fields: |
             [{ "title": "Branch and PR title Failed", "value": "PR and Branch naming rule checker was failed", "short": true }]
