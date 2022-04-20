@@ -1,17 +1,23 @@
 name: PR and branch naming rule
 
 on:
- workflow_dispatch:
- pull_request:
-   branches: [ master ]
-   types: [ opened, edited, synchronize, reopened ]
+  pull_request:
+    branches: [ master ]
+    types: [ opened, edited, synchronize, reopened ]
 
 jobs:
   naming_rule:
     runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.set_output.outputs.status }}
     steps:
-    
+
+      - uses: deepakputhraya/action-pr-title@master
+        with:
+          regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
+          github_token: ${{ secrets.TOKEN }}
+
       - uses: deepakputhraya/action-branch-name@master
         with:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
-          ignore: master,develop,test,release
+          ignore: master
