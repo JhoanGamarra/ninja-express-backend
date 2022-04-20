@@ -24,19 +24,6 @@ jobs:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
           ignore: master
 
-      - name: Slack Notification
-        if: ${{ needs.create_build.outputs.status != 'success' }} 
-        uses: edge/simple-slack-notify@master
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-        with:
-          status: ${{ job.status }}
-          text: ${{ steps.set_output.outputs.status }} 
-          color: 'good'
-          success_text: 'Something was wrong, please check the branch or PR name'
-          fields: |
-            [{ "title": "Branch and PR title checker", "value": "${{ steps.set_output.outputs.status }}", "short": true }]
-
   notification:
     runs-on: ubuntu-latest
     if: always()
@@ -53,8 +40,8 @@ jobs:
       env:
         SLACK_CHANNEL: android
         SLACK_COLOR: '#008000'
-        SLACK_MESSAGE: 'Test build created succesfully ${{ github.head_ref }} from ${{ env.GIT_COMMIT_COMMITTER_NAME }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
-        SLACK_TITLE: 'Create test build'
+        SLACK_MESSAGE: 'Test build created succesfully ${{ github.head_ref }} : ${{ steps.set_output.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
+        SLACK_TITLE: 'PR and Branch naming rule checker'
         SLACK_USERNAME: bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         
@@ -64,7 +51,7 @@ jobs:
       env:
         SLACK_CHANNEL: android
         SLACK_COLOR: '#FF0000'
-        SLACK_MESSAGE: 'Error creating test build ${{ github.head_ref }} from ${{ env.GIT_COMMIT_COMMITTER_NAME }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
-        SLACK_TITLE: 'Create test build'
+        SLACK_MESSAGE: 'Error with PR and branch naming rule ${{ github.head_ref }} : ${{ steps.set_output.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
+        SLACK_TITLE: 'PR and Branch naming rule checker'
         SLACK_USERNAME: bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
