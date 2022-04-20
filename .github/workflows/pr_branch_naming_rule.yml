@@ -1,4 +1,4 @@
-name: PR and branch naming rule
+name: PR and branch naming rule checker
 
 on:
   pull_request:
@@ -12,12 +12,27 @@ jobs:
       status: ${{ steps.set_output.outputs.status }}
     steps:
 
-      - uses: deepakputhraya/action-pr-title@master
+      - name: PR title checker
+        uses: deepakputhraya/action-pr-title@master
         with:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
           github_token: ${{ secrets.TOKEN }}
 
-      - uses: deepakputhraya/action-branch-name@master
+      - name: PR title checker
+        uses: deepakputhraya/action-branch-name@master
         with:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
           ignore: master
+
+      - name: Slack Notification
+        if: ${{ needs.create_build.outputs.status != 'success' }} 
+        uses: edge/simple-slack-notify@master
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        with:
+          status: ${{ job.status }}
+          text: ${{ steps.set_output.outputs.status }} 
+          color: 'good'
+          success_text: 'Something was wrong, please check the branch or PR name'
+          fields: |
+            [{ "title": "Branch and PR title checker", "value": ${{ steps.set_output.outputs.status }}, "short": true }]

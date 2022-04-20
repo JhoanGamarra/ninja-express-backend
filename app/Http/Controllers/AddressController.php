@@ -9,11 +9,7 @@ use Illuminate\Http\Request;
 
 class AddressController extends Controller
 {
-    /**
-     * Create a new AddressController instance.
-     *
-     * @return void
-     */
+ 
     public function __construct()
     {
         $this->middleware('auth:api');

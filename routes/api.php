@@ -151,3 +151,18 @@ Route::group(
         $router->post('/distancedriving', 'OrderController@GetDrivingDistance');
     }
 );
+
+Route::group(
+    [
+        'middleware' => 'api',
+        'prefix' => 'v2',
+    ],
+    function ($router) {
+       
+        $router->get(
+            '/addresses/{address_id}',
+            'AddressController@getAddressById'
+        );
+               
+    }
+);

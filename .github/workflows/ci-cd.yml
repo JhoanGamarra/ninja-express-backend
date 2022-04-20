@@ -45,7 +45,7 @@ jobs:
        run: vendor/bin/phpunit --verbose
   
  build:
-   name: Build
+   name: Deploy to develop environment
    runs-on: ubuntu-latest
    steps:
    - name: executing remote ssh commands using password
