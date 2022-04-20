@@ -54,7 +54,7 @@ jobs:
      with:
        host: ${{ secrets.HOST }}
        username: ${{ secrets.USERNAME }}
-       password: ${{ secrets.TOKEN }}
+       password: ${{ secrets.PASS }}
        port: ${{ secrets.PORT }}
        script: |
          cd ninja-express-backend
