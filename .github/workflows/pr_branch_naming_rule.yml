@@ -34,7 +34,7 @@ jobs:
           text: 'Successful' 
           color: 'good'
           fields: |
-            [{ "title": "Branch and PR title checker", "value": PR and Branch naming rule checker was succesful, "short": true }]
+            [{ "title": "Branch and PR title checker", "value": "PR and Branch naming rule checker was succesful", "short": true }]
 
       - name: Slack Notification Failed
         if: ${{ steps.set_output.outputs.status != 'success' }}
@@ -46,4 +46,4 @@ jobs:
           text: 'Failed'
           color: 'danger'
           fields: |
-            [{ "title": "Branch and PR title Failed", "value": PR and Branch naming rule checker was failed, "short": true }]
+            [{ "title": "Branch and PR title Failed", "value": "PR and Branch naming rule checker was failed", "short": true }]
