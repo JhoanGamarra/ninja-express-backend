@@ -40,7 +40,7 @@ jobs:
       env:
         SLACK_CHANNEL: android
         SLACK_COLOR: '#008000'
-        SLACK_MESSAGE: 'Test build created succesfully ${{ github.head_ref }} : ${{ steps.set_output.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
+        SLACK_MESSAGE: 'Test build created succesfully ${{ github.head_ref }} : ${{ needs.naming_rule.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
         SLACK_TITLE: 'PR and Branch naming rule checker'
         SLACK_USERNAME: bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -51,7 +51,7 @@ jobs:
       env:
         SLACK_CHANNEL: android
         SLACK_COLOR: '#FF0000'
-        SLACK_MESSAGE: 'Error with PR and branch naming rule ${{ github.head_ref }} : ${{ steps.set_output.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
+        SLACK_MESSAGE: 'Error with PR and branch naming rule ${{ github.head_ref }} : ${{ needs.naming_rule.outputs.status }} - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}'
         SLACK_TITLE: 'PR and Branch naming rule checker'
         SLACK_USERNAME: bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
