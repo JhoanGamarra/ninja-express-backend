@@ -35,4 +35,4 @@ jobs:
           color: 'good'
           success_text: 'Something was wrong, please check the branch or PR name'
           fields: |
-            [{ "title": "Branch and PR title checker", "value": ${{ steps.set_output.outputs.status }}, "short": true }]
+            [{ "title": "Branch and PR title checker", "value": "${{ steps.set_output.outputs.status }}", "short": true }]
