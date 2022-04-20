@@ -11,14 +11,11 @@ jobs:
     outputs:
       status: ${{ steps.set_output.outputs.status }}
     steps:
-    
-      - name: Verify PR Title
       - uses: deepakputhraya/action-pr-title@master
         with:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
           github_token: ${{ secrets.TOKEN }}
 
-      - name: Verify Branch Name
       - uses: deepakputhraya/action-branch-name@master
         with:
           regex: '^(((feature|hotfix|fix)\/){1}(((NINJAMA|ninjama|NINJAFE|ninjafe){1}-[0-9]{1,}.{1,}))|((nonjira|NONJIRA){1}-.{1,}))|^((version|release)\/){1}(((v|V){1}[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}_.{1,}))$'
@@ -30,7 +27,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         with:
           status: ${{ job.status }}
-          text: ${{ steps.set_output.outputs.status }}
+          text: ${{ steps.set_output.outputs.status }} 
           color: 'good'
           success_text: 'Something was wrong, please check the branch or PR name'
           fields: |
