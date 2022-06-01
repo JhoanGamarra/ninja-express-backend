@@ -168,6 +168,8 @@ Route::group(
 
         $router->get('/categories/all', 'CategoryController@getCategories');
 
+        $router->get('/categories/todos', 'CategoryController@getCategories');
+
                
     }
 );
