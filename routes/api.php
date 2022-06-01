@@ -165,6 +165,8 @@ Route::group(
         );
 
         $router->get('/categories', 'CategoryController@getCategories');
+        
+        $router->get('/categories/todos', 'CategoryController@getCategories');
                
     }
 );
