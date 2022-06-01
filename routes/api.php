@@ -163,6 +163,8 @@ Route::group(
             '/addresses/{address_id}',
             'AddressController@getAddressById'
         );
+
+        $router->get('/categories', 'CategoryController@getCategories');
                
     }
 );
