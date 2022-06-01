@@ -37,15 +37,17 @@ class ProductController extends Controller
     public function getProducts($businessId)
     {
         $products = Product::whereBusinessId($businessId)->get();
-
+        $subcategories = [];
         foreach ($products as $product) {
-            $subcategories = ProductSubcategory::whereProductId(
+            $productSubcategories = ProductSubcategory::whereProductId(
                 $product->id
             )->get();
-            foreach ($subcategories as $subcategory) {
-                $subcategory['subcategory'] = Category::findOrFail(
+            foreach ($productSubcategories as $subcategory) {
+                $subcategory = Category::findOrFail(
                     $subcategory->category_id
                 );
+                array_push($subcategories, $subcategory);
+              
             }
             $product['subcategories'] = $subcategories;
         }

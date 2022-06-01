@@ -63,9 +63,11 @@ class BusinessController extends Controller
             $business->category_id = (int) $request->category_id;
         }
         $subcategories = (array) $request->subcategories;
-        if($subcategories){
-        $oldSubcategories = BusinessSubcategory::whereBusinessId($business->id)->get();
-            foreach($oldSubcategories as $oldSubcategory){
+        if ($subcategories) {
+            $oldSubcategories = BusinessSubcategory::whereBusinessId(
+                $business->id
+            )->get();
+            foreach ($oldSubcategories as $oldSubcategory) {
                 $oldSubcategory->delete();
             }
             $subcategories = (array) $request->subcategories;
@@ -75,25 +77,33 @@ class BusinessController extends Controller
                     'category_id' => $subcagoryId,
                 ]);
             }
-            $subcategoriesResponse = BusinessSubcategory::whereBusinessId($business->id)->get();
-            foreach($subcategoriesResponse as $subcategoryResponse){
-                $subcategoryResponse['subcategory'] = Category::find($subcategoryResponse->category_id);
+            $subcategoriesResponse = BusinessSubcategory::whereBusinessId(
+                $business->id
+            )->get();
+            foreach ($subcategoriesResponse as $subcategoryResponse) {
+                $subcategoryResponse['subcategory'] = Category::find(
+                    $subcategoryResponse->category_id
+                );
             }
-        }else{
-            $subcategoriesResponse = BusinessSubcategory::whereBusinessId($business->id)->get();
-            foreach($subcategoriesResponse as $subcategoryResponse){
-                $subcategoryResponse['subcategory'] = Category::find($subcategoryResponse->category_id);
+        } else {
+            $subcategoriesResponse = BusinessSubcategory::whereBusinessId(
+                $business->id
+            )->get();
+            foreach ($subcategoriesResponse as $subcategoryResponse) {
+                $subcategoryResponse['subcategory'] = Category::find(
+                    $subcategoryResponse->category_id
+                );
             }
         }
-        if($request->address_id){
+        if ($request->address_id) {
             $business->address_id = (int) $request->address_id;
         }
-        if($request->file('photo')){
+        if ($request->file('photo')) {
             $business->photo = $this->uploadPhoto($request, $business);
         }
         $business->save();
         $business['subcategories'] = $subcategoriesResponse;
-        if($request->address_id){
+        if ($request->address_id) {
             $business['address'] = Address::findOrFail($request->address_id);
         }
         return response()->json($business, 211);
@@ -102,9 +112,18 @@ class BusinessController extends Controller
     public function getBusinessesByCategory(Request $request, $categoryId)
     {
         $clientAddress = Address::find($request->query('addressId'));
+        $category = Category::find($categoryId);
         $businesses = Business::whereCategoryId($categoryId)->get();
         foreach ($businesses as $business) {
+            $subcategories = [];
             $businessAddress = Address::findOrFail($business->address_id);
+            $businessCategories = BusinessSubcategory::whereBusinessId(
+                $business->id
+            )->get();
+            foreach ($businessCategories as $businessCategory) {
+                $subcategory = Category::find($businessCategory->category_id);
+                array_push($subcategories, $subcategory);
+            }
             $distance = (int) $this->calculateDistance(
                 $businessAddress->lat,
                 $businessAddress->lng,
@@ -113,23 +132,26 @@ class BusinessController extends Controller
             );
             switch (true) {
                 case $distance <= 3:
-                    $business['deliveryCost'] = 25;
+                    $business['delivery_cost'] = 25;
                     break;
                 case $distance <= 6:
-                    $business['deliveryCost'] = 35;
+                    $business['delivery_cost'] = 35;
                     break;
                 case $distance <= 10:
-                    $business['deliveryCost'] = 45;
+                    $business['delivery_cost'] = 45;
                     break;
                 case $distance <= 15:
-                    $business['deliveryCost'] = 50;
+                    $business['delivery_cost'] = 50;
                     break;
                 default:
-                    $business['deliveryCost'] = 50;
+                    $business['delivery_cost'] = 50;
                     break;
             }
+
             $business['distance'] = $distance;
-            $business['address'] = $businessAddress;
+            $business['category'] = $category->name;
+            $business['subcategories'] = $subcategories;
+            $business['address'] = $businessAddress->address;
         }
         //sort businesses by distance
         $businesessArray[] = $businesses;
